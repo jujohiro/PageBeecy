@@ -1,45 +1,51 @@
+const MOCK_POSTS = [
+    {
+        id: '1',
+        content: 'Esta es una publicación de prueba para el panel de moderación. El contenido puede variar.',
+        images: ['https://via.placeholder.com/400x300?text=Imagen+1', 'https://via.placeholder.com/400x300?text=Imagen+2'],
+        user: {
+            id: 'user123',
+            name: 'Juan Pérez'
+        },
+        createdAt: new Date().toISOString()
+    },
+    {
+        id: '2',
+        content: 'Otra publicación de ejemplo con contenido diferente para demostrar la funcionalidad del panel.',
+        images: ['https://via.placeholder.com/400x300?text=Imagen+3'],
+        user: {
+            id: 'user456',
+            name: 'María González'
+        },
+        createdAt: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+        id: '3',
+        content: 'Publicación sin imágenes para mostrar diferentes casos de uso.',
+        images: [],
+        user: {
+            id: 'user789',
+            name: 'Carlos Rodríguez'
+        },
+        createdAt: new Date(Date.now() - 7200000).toISOString()
+    }
+];
+
 async function getPosts(filters = {}) {
-    const body = {
-        userLat: typeof filters.userLat === 'number' ? filters.userLat : (typeof filters.lat === 'number' ? filters.lat : 0),
-        userLon: typeof filters.userLon === 'number' ? filters.userLon : (typeof filters.lon === 'number' ? filters.lon : 0),
-        area: typeof filters.area === 'number' ? filters.area : 0
-    };
-    
-    const response = await apiPost('/feed/get-home', body, true);
-    
-    if (Array.isArray(response)) {
-        return response;
-    }
-    
-    if (response.posts && Array.isArray(response.posts)) {
-        return response.posts;
-    }
-    
-    if (response.data && Array.isArray(response.data)) {
-        return response.data;
-    }
-    
-    return [];
+    return MOCK_POSTS;
 }
 
 async function approvePost(postId) {
-    if (!postId) {
-        throw new Error('ID de post requerido');
-    }
-    const endpoint = `/admin/posts/${postId}/approve`;
-    return await apiPost(endpoint, {}, true);
+    return { success: true, message: 'Post aprobado' };
 }
 
 async function rejectPost(postId) {
-    if (!postId) {
-        throw new Error('ID de post requerido');
-    }
-    const endpoint = `/admin/posts/${postId}/reject`;
-    return await apiPost(endpoint, {}, true);
+    return { success: true, message: 'Post rechazado' };
 }
 
 function renderPosts(posts, container) {
     if (!container) return;
+    
     if (!posts || posts.length === 0) {
         container.innerHTML = '<div class="empty-state"><p>Sin publicaciones pendientes</p></div>';
         return;
@@ -173,21 +179,14 @@ function escapeHtml(text) {
 
 async function loadPosts() {
     const container = document.getElementById('posts-container');
-    const loadingContainer = document.getElementById('loading-container');
     const messageContainer = document.getElementById('message-container');
     
-    if (loadingContainer) {
-        loadingContainer.style.display = 'block';
-    }
     if (container) {
         container.innerHTML = '';
     }
     
     try {
         const posts = await getPosts();
-        if (loadingContainer) {
-            loadingContainer.style.display = 'none';
-        }
         if (container) {
             renderPosts(posts, container);
         }
@@ -197,14 +196,10 @@ async function loadPosts() {
             }
         }
     } catch (error) {
-        if (loadingContainer) {
-            loadingContainer.style.display = 'none';
-        }
         if (container) {
             container.innerHTML = `<div class="error-state">
                 <p>Error al cargar los posts</p>
                 <p class="error-details">${escapeHtml(error.message || 'Error desconocido')}</p>
-                <button class="btn btn-retry" onclick="loadPosts()">Reintentar</button>
             </div>`;
         }
         if (messageContainer) {
