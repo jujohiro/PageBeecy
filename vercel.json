@@ -1,22 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/login.html",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/verify.html",
-      "destination": "/verify.html"
-    },
-    {
-      "source": "/index.html",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -37,4 +19,3 @@
     }
   ]
 }
-
