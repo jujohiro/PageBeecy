@@ -4,7 +4,7 @@
   "description": "Panel de moderación web para Beecy",
   "type": "module",
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "scripts": {},
   "keywords": [],
