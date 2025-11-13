@@ -1,4 +1,36 @@
-const BASE_URL = (window.BASE_URL || 'http://15.235.44.199/').replace(/\/+$/, '') + '/';
+let BASE_URL;
+
+try {
+    if (typeof window !== 'undefined' && window.location) {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        
+        // Si es HTTPS (producción en Vercel), SIEMPRE usar proxy /api
+        if (protocol === 'https:') {
+            BASE_URL = '/api/';
+            console.log('[API] ✅ Modo producción (HTTPS) - usando proxy /api/');
+        } 
+        // Desarrollo local: usar backend directo (solo en localhost)
+        else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            BASE_URL = 'http://15.235.44.199/';
+            console.log('[API] 🔧 Modo desarrollo (localhost) - usando backend directo:', BASE_URL);
+        }
+        // Cualquier otro caso (producción HTTP, etc.): usar proxy por seguridad
+        else {
+            BASE_URL = '/api/';
+            console.log('[API] ✅ Modo producción (hostname:', hostname, ') - usando proxy /api/');
+        }
+    } else {
+        // Fallback: si no se puede detectar, usar proxy por seguridad
+        BASE_URL = '/api/';
+        console.log('[API] ⚠️ No se pudo detectar el entorno - usando proxy /api/ por defecto');
+    }
+} catch (error) {
+    // Si hay algún error, usar proxy por seguridad
+    BASE_URL = '/api/';
+    console.error('[API] Error al detectar entorno:', error, '- usando proxy /api/ por defecto');
+}
+BASE_URL = BASE_URL.replace(/\/+$/, '') + '/';
 
 /**
  * Realiza una petición HTTP al backend
@@ -65,11 +97,14 @@ async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = 
             options.body = body;
         }
         
-        // Log de la petición (solo en desarrollo)
+        // Log de la petición
         console.log(`[API] ${method.toUpperCase()} ${url}`, {
             contentType: contentType === 'form' ? 'application/x-www-form-urlencoded' : 'application/json',
             body: data || 'N/A',
-            requiresAuth: requiresAuth
+            requiresAuth: requiresAuth,
+            baseUrl: BASE_URL,
+            isProduction: window.location?.protocol === 'https:',
+            hostname: window.location?.hostname
         });
         
         // Realizar la petición

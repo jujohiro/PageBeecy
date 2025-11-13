@@ -1,0 +1,14 @@
+{
+  "name": "beecy-admin-web",
+  "version": "1.0.0",
+  "description": "Panel de moderación web para Beecy",
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
