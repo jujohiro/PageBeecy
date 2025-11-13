@@ -64,9 +64,21 @@ async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = 
                 headers['Content-Type'] = 'application/x-www-form-urlencoded';
                 // Convertir objeto a formato form-urlencoded
                 const formData = new URLSearchParams();
-                for (const key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        formData.append(key, data[key]);
+                // Usar Object.entries para mayor compatibilidad
+                if (Object.entries && typeof data === 'object' && data !== null) {
+                    for (const [key, value] of Object.entries(data)) {
+                        if (value !== undefined && value !== null) {
+                            formData.append(key, String(value));
+                        }
+                    }
+                } else if (typeof data === 'object' && data !== null) {
+                    // Fallback: usar Object.keys
+                    const keys = Object.keys(data);
+                    for (const key of keys) {
+                        const value = data[key];
+                        if (value !== undefined && value !== null) {
+                            formData.append(key, String(value));
+                        }
                     }
                 }
                 body = formData.toString();
