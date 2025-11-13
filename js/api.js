@@ -1,4 +1,3 @@
-
 const BASE_URL = (window.BASE_URL || 'http://15.235.44.199/').replace(/\/+$/, '') + '/';
 
 /**
