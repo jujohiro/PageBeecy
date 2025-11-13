@@ -45,53 +45,40 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Obtener número de teléfono de la URL
         const phone = getURLParameter('phone');
 
-        // Si no hay teléfono, redirigir a login
         if (!phone) {
             window.location.href = 'login.html';
         }
 
-        // Mostrar número de teléfono
         document.getElementById('phone-display').textContent = phone;
 
-        // Enfocar input OTP al cargar
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('otp').focus();
         });
 
-        // Manejar el envío del formulario
         async function handleVerify(event) {
             event.preventDefault();
 
             const otpInput = document.getElementById('otp');
             const verifyBtn = document.getElementById('verify-btn');
             const messageContainer = document.getElementById('message-container');
-
             const otp = otpInput.value.trim();
 
-            // Validar formato
             if (!validateOTP(otp)) {
                 showError('El código OTP debe tener 6 dígitos', messageContainer);
                 otpInput.focus();
                 return;
             }
 
-            // Deshabilitar botón durante la petición
             verifyBtn.disabled = true;
             verifyBtn.textContent = 'Verificando...';
             clearMessage(messageContainer);
 
             try {
-                // Verificar OTP
                 await verifyOtp(phone, otp);
-
-                // Redirigir a index.html
                 window.location.href = 'index.html';
-
             } catch (error) {
-                console.error('Error al verificar OTP:', error);
                 showError(error.message || 'Código OTP inválido. Por favor, intenta de nuevo.', messageContainer);
                 verifyBtn.disabled = false;
                 verifyBtn.textContent = 'Verificar';
@@ -100,26 +87,20 @@
             }
         }
 
-        // Manejar reenvío de código
         async function handleResend() {
             const resendBtn = document.getElementById('resend-btn');
             const messageContainer = document.getElementById('message-container');
 
-            // Deshabilitar botón durante la petición
             resendBtn.disabled = true;
             resendBtn.textContent = 'Enviando...';
             clearMessage(messageContainer);
 
             try {
-                // Enviar OTP nuevamente
                 await sendOtp(phone);
-
                 showSuccess('Código reenviado correctamente', messageContainer);
                 document.getElementById('otp').focus();
                 document.getElementById('otp').value = '';
-
             } catch (error) {
-                console.error('Error al reenviar OTP:', error);
                 showError(error.message || 'Error al reenviar código. Por favor, intenta de nuevo.', messageContainer);
             } finally {
                 resendBtn.disabled = false;
@@ -127,26 +108,19 @@
             }
         }
 
-        // Auto-avanzar entre campos (si fueran múltiples)
-        // Permitir solo números en el input OTP
         document.getElementById('otp').addEventListener('input', function (e) {
             let value = e.target.value;
-            // Eliminar caracteres no numéricos
             value = value.replace(/\D/g, '');
-            // Limitar a 6 dígitos
             value = value.substring(0, 6);
             e.target.value = value;
 
-            // Si se completa el código, enviar automáticamente
             if (value.length === 6) {
-                // Pequeño delay para que el usuario vea el último dígito
                 setTimeout(() => {
                     document.getElementById('verify-form').dispatchEvent(new Event('submit'));
                 }, 100);
             }
         });
 
-        // Permitir pegar código OTP
         document.getElementById('otp').addEventListener('paste', function (e) {
             e.preventDefault();
             const pastedData = e.clipboardData.getData('text');
@@ -157,7 +131,6 @@
             }
         });
 
-        // Permitir Enter para verificar
         document.getElementById('otp').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 handleVerify(e);

@@ -40,91 +40,52 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Verificar si ya está autenticado
         if (isAuthenticated()) {
             window.location.href = 'index.html';
         }
 
-        // Manejar el envío del formulario
         async function handleLogin(event) {
             event.preventDefault();
 
             const phoneInput = document.getElementById('phone');
             const submitBtn = document.getElementById('submit-btn');
             const messageContainer = document.getElementById('message-container');
-
             const phone = phoneInput.value.trim();
-
-            // Validar formato
             const formattedPhone = formatPhone(phone);
+
             if (!validatePhone(formattedPhone)) {
                 showError('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)', messageContainer);
                 phoneInput.focus();
                 return;
             }
 
-            // Deshabilitar botón durante la petición
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
             clearMessage(messageContainer);
 
             try {
-                // Enviar OTP
-                console.log('[Login] Iniciando envío de OTP...');
-                const response = await sendOtp(formattedPhone);
-                console.log('[Login] OTP enviado correctamente:', response);
-
-                // Mostrar mensaje de éxito antes de redirigir
+                await sendOtp(formattedPhone);
                 showSuccess('Código OTP enviado correctamente. Redirigiendo...', messageContainer);
-
-                // Pequeño delay para que el usuario vea el mensaje
                 setTimeout(() => {
-                    // Redirigir a verify.html con el número de teléfono
                     redirectTo('verify.html', { phone: formattedPhone });
                 }, 500);
-
             } catch (error) {
-                console.error('[Login] Error al enviar OTP:', error);
-                console.error('[Login] Detalles del error:', {
-                    name: error.name,
-                    message: error.message,
-                    status: error.status,
-                    stack: error.stack
-                });
-
-                // Mostrar mensaje de error más descriptivo
-                let errorMessage = error.message || 'Error al enviar código OTP. Por favor, intenta de nuevo.';
-
-                // Si es un error de CORS, dar más información
-                if (error.message && error.message.includes('CORS')) {
-                    errorMessage = 'Error de CORS: El backend no permite solicitudes desde localhost. Por favor, contacta al equipo del backend para configurar CORS, o despliega la aplicación en Vercel para probar.';
-                }
-
-                // Si es un error de conexión, dar más información
-                if (error.message && error.message.includes('conexión')) {
-                    errorMessage = 'Error de conexión: No se pudo conectar con el backend. Verifica: 1) Tu conexión a internet, 2) Que el backend esté disponible en http://15.235.44.199, 3) Que CORS esté configurado correctamente.';
-                }
-
-                showError(errorMessage, messageContainer);
+                showError(error.message || 'Error al enviar código OTP. Por favor, intenta de nuevo.', messageContainer);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Continuar';
                 phoneInput.focus();
             }
         }
 
-        // Auto-formatear el teléfono mientras se escribe
         document.getElementById('phone').addEventListener('input', function (e) {
             let value = e.target.value;
-            // Eliminar caracteres no numéricos excepto +
             value = value.replace(/[^\d+]/g, '');
-            // Asegurar que empiece con +
             if (value && !value.startsWith('+')) {
                 value = '+' + value.replace(/^\+/, '');
             }
             e.target.value = value;
         });
 
-        // Permitir Enter para enviar
         document.getElementById('phone').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 handleLogin(e);
