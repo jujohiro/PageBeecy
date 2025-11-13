@@ -11,25 +11,30 @@ export default async function handler(req, res) {
             return res.status(405).json({ error: 'Method not allowed' });
         }
         
+        const postId = req.query.id;
+        if (!postId) {
+            return res.status(400).json({ error: 'Post ID is required' });
+        }
+        
         const backendBaseUrl = process.env.BACKEND_URL || 'https://api.beecy.app';
-        const backendUrl = `${backendBaseUrl}/feed/get-home`;
+        const backendUrl = `${backendBaseUrl}/admin/posts/${postId}/approve`;
         const headers = {
-            'Content-Type': req.headers['content-type'] || 'application/json'
+            'Content-Type': 'application/json'
         };
         
+        // Pasar el token de autorización al backend
         if (req.headers.authorization) {
             headers['Authorization'] = req.headers.authorization;
         }
-        
-        const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
         
         const fetchOptions = {
             method: 'POST',
             headers: headers
         };
         
-        if (body) {
-            fetchOptions.body = body;
+        // Si hay body, enviarlo
+        if (req.body && Object.keys(req.body).length > 0) {
+            fetchOptions.body = JSON.stringify(req.body);
         }
         
         const response = await fetch(backendUrl, fetchOptions);
@@ -55,7 +60,7 @@ export default async function handler(req, res) {
         }
         
     } catch (error) {
-        console.error('Error en get-home:', {
+        console.error('Error en approve post:', {
             message: error.message,
             code: error.code,
             cause: error.cause,
@@ -69,3 +74,4 @@ export default async function handler(req, res) {
         });
     }
 }
+

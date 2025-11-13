@@ -3,7 +3,7 @@ export default async function handler(req, res) {
         if (req.method === 'OPTIONS') {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
             return res.status(200).end();
         }
         
@@ -12,16 +12,23 @@ export default async function handler(req, res) {
         }
         
         const backendBaseUrl = process.env.BACKEND_URL || 'https://api.beecy.app';
-        const backendUrl = `${backendBaseUrl}/feed/get-home`;
+        const backendUrl = `${backendBaseUrl}/auth/logout`;
         const headers = {
-            'Content-Type': req.headers['content-type'] || 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
         };
         
-        if (req.headers.authorization) {
-            headers['Authorization'] = req.headers.authorization;
+        let body = '';
+        if (req.body && typeof req.body === 'object') {
+            const formData = new URLSearchParams();
+            for (const [key, value] of Object.entries(req.body)) {
+                if (value !== undefined && value !== null) {
+                    formData.append(key, String(value));
+                }
+            }
+            body = formData.toString();
+        } else if (typeof req.body === 'string') {
+            body = req.body;
         }
-        
-        const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
         
         const fetchOptions = {
             method: 'POST',
@@ -44,7 +51,7 @@ export default async function handler(req, res) {
         
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         
         res.status(response.status);
         
@@ -55,7 +62,7 @@ export default async function handler(req, res) {
         }
         
     } catch (error) {
-        console.error('Error en get-home:', {
+        console.error('Error en logout:', {
             message: error.message,
             code: error.code,
             cause: error.cause,
@@ -69,3 +76,4 @@ export default async function handler(req, res) {
         });
     }
 }
+

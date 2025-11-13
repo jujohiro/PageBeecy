@@ -48,7 +48,7 @@ beecy-admin-web/
 
 El proyecto utiliza la siguiente variable de entorno:
 
-- `BASE_URL`: URL base del backend (por defecto: `http://15.235.44.199/`)
+- `BASE_URL`: URL base del backend (por defecto: `https://api.beecy.app/`)
 
 Para configurar en Vercel:
 

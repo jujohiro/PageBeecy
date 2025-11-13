@@ -44,13 +44,13 @@ function renderPosts(posts, container) {
     if (!container) return;
     
     if (!posts || posts.length === 0) {
-        container.innerHTML = `<div class="empty-state"><p>No hay posts disponibles</p></div>`;
+        container.innerHTML = `<div class="empty-state"><p>Sin publicaciones pendientes</p></div>`;
         return;
     }
     
     const postsHTML = posts.map(post => {
         const images = post.images || [];
-        const imagesHTML = images.length > 0 
+        const imagesHTML = images.length > 0
             ? images.map(img => `<img src="${img}" alt="Imagen del post" class="post-image" loading="lazy">`).join('')
             : '';
         
@@ -208,7 +208,7 @@ async function loadPosts() {
         
         if (!posts || posts.length === 0) {
             if (messageContainer) {
-                showSuccess('No hay posts pendientes de moderación', messageContainer);
+                showSuccess('Sin publicaciones pendientes', messageContainer);
             }
         }
     } catch (error) {

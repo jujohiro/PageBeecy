@@ -50,15 +50,41 @@ function isAuthenticated() {
     return token !== null && token !== undefined && token !== '';
 }
 
-function logout() {
-    removeToken();
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_id');
-    window.location.href = 'login.html';
+async function logout() {
+    try {
+        const userId = localStorage.getItem('user_id');
+        if (userId) {
+            // Intentar hacer logout en el backend
+            try {
+                await apiPost('/auth/logout', { id: userId }, false, 'form');
+            } catch (error) {
+                // Si falla el logout en el backend, continuar con el logout local
+                console.warn('Error al hacer logout en el backend:', error);
+            }
+        }
+    } catch (error) {
+        console.warn('Error durante logout:', error);
+    } finally {
+        // Siempre limpiar el localStorage y redirigir
+        removeToken();
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_id');
+        // Usar ruta absoluta para evitar problemas con rutas relativas
+        // Si estamos en /test/, usar ruta absoluta, sino usar relativa
+        const loginPath = window.location.pathname.includes('/test/') 
+            ? '/login.html' 
+            : 'login.html';
+        window.location.href = loginPath;
+    }
 }
 
 function requireAuth() {
     if (!isAuthenticated()) {
-        window.location.href = 'login.html';
+        // Usar ruta absoluta para evitar problemas con rutas relativas
+        // Si estamos en /test/, usar ruta absoluta, sino usar relativa
+        const loginPath = window.location.pathname.includes('/test/') 
+            ? '/login.html' 
+            : 'login.html';
+        window.location.href = loginPath;
     }
 }

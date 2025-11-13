@@ -11,7 +11,8 @@ export default async function handler(req, res) {
             return res.status(405).json({ error: 'Method not allowed' });
         }
         
-        const backendUrl = 'http://15.235.44.199/auth/verify-otp';
+        const backendBaseUrl = process.env.BACKEND_URL || 'https://api.beecy.app';
+        const backendUrl = `${backendBaseUrl}/auth/verify-otp`;
         const headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         };
