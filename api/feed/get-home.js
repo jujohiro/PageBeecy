@@ -11,7 +11,7 @@ export default async function handler(req, res) {
             return res.status(405).json({ error: 'Method not allowed' });
         }
         
-        const backendUrl = 'https://15.235.44.199/feed/get-home';
+        const backendUrl = 'http://15.235.44.199/feed/get-home';
         const headers = {
             'Content-Type': req.headers['content-type'] || 'application/json'
         };
@@ -22,12 +22,16 @@ export default async function handler(req, res) {
         
         const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
         
-        const response = await fetch(backendUrl, {
+        const fetchOptions = {
             method: 'POST',
-            headers: headers,
-            body: body
-        });
+            headers: headers
+        };
         
+        if (body) {
+            fetchOptions.body = body;
+        }
+        
+        const response = await fetch(backendUrl, fetchOptions);
         const responseContentType = response.headers.get('content-type') || '';
         let responseData;
         
@@ -50,11 +54,17 @@ export default async function handler(req, res) {
         }
         
     } catch (error) {
+        console.error('Error en get-home:', {
+            message: error.message,
+            code: error.code,
+            cause: error.cause,
+            stack: error.stack
+        });
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(500).json({
             error: 'Error al conectar con el backend',
-            message: error.message
+            message: error.message || 'Error desconocido',
+            details: error.code || 'Sin código de error'
         });
     }
 }
-
