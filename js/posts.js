@@ -1,8 +1,8 @@
 const MOCK_POSTS = [
     {
         id: '1',
-        content: 'Esta es una publicación de prueba para el panel de moderación. El contenido puede variar.',
-        images: ['https://via.placeholder.com/400x300?text=Imagen+1', 'https://via.placeholder.com/400x300?text=Imagen+2'],
+        content: 'Esta es una publicación de prueba para el panel de moderación. El contenido puede variar según el tipo de publicación.',
+        images: ['https://via.placeholder.com/400x300?text=Imagen+1', 'https://via.placeholder.com/400x300?text=Imagen+2', 'https://via.placeholder.com/400x300?text=Imagen+3', 'https://via.placeholder.com/400x300?text=Imagen+4', 'https://via.placeholder.com/400x300?text=Imagen+5'],
         user: {
             id: 'user123',
             name: 'Juan Pérez'
@@ -11,8 +11,8 @@ const MOCK_POSTS = [
     },
     {
         id: '2',
-        content: 'Otra publicación de ejemplo con contenido diferente para demostrar la funcionalidad del panel.',
-        images: ['https://via.placeholder.com/400x300?text=Imagen+3'],
+        content: 'Otra publicación de ejemplo con contenido diferente para demostrar la funcionalidad del panel de moderación.',
+        images: ['https://via.placeholder.com/400x300?text=Imagen+A', 'https://via.placeholder.com/400x300?text=Imagen+B'],
         user: {
             id: 'user456',
             name: 'María González'
@@ -21,13 +21,43 @@ const MOCK_POSTS = [
     },
     {
         id: '3',
-        content: 'Publicación sin imágenes para mostrar diferentes casos de uso.',
+        content: 'Publicación sin imágenes para mostrar diferentes casos de uso en el panel de moderación.',
         images: [],
         user: {
             id: 'user789',
             name: 'Carlos Rodríguez'
         },
         createdAt: new Date(Date.now() - 7200000).toISOString()
+    },
+    {
+        id: '4',
+        content: 'Esta publicación tiene una sola imagen para verificar cómo se muestra en el diseño compacto.',
+        images: ['https://via.placeholder.com/400x300?text=Solo+1'],
+        user: {
+            id: 'user101',
+            name: 'Ana Martínez'
+        },
+        createdAt: new Date(Date.now() - 10800000).toISOString()
+    },
+    {
+        id: '5',
+        content: 'Publicación con múltiples imágenes para probar el contador de imágenes adicionales.',
+        images: ['https://via.placeholder.com/400x300?text=1', 'https://via.placeholder.com/400x300?text=2', 'https://via.placeholder.com/400x300?text=3', 'https://via.placeholder.com/400x300?text=4', 'https://via.placeholder.com/400x300?text=5', 'https://via.placeholder.com/400x300?text=6'],
+        user: {
+            id: 'user202',
+            name: 'Luis Fernández'
+        },
+        createdAt: new Date(Date.now() - 14400000).toISOString()
+    },
+    {
+        id: '6',
+        content: 'Otra publicación de prueba con contenido variado para el panel de moderación.',
+        images: ['https://via.placeholder.com/400x300?text=X', 'https://via.placeholder.com/400x300?text=Y', 'https://via.placeholder.com/400x300?text=Z'],
+        user: {
+            id: 'user303',
+            name: 'Sofía López'
+        },
+        createdAt: new Date(Date.now() - 18000000).toISOString()
     }
 ];
 
@@ -54,7 +84,7 @@ function renderPosts(posts, container) {
     const postsHTML = posts.map(post => {
         const images = post.images || [];
         const imagesHTML = images.length > 0
-            ? images.map(img => `<img src="${escapeHtml(img)}" alt="Imagen del post" class="post-image" loading="lazy">`).join('')
+            ? images.slice(0, 4).map(img => `<img src="${escapeHtml(img)}" alt="Imagen" class="post-image-thumbnail" loading="lazy" onclick="viewImage('${escapeHtml(img)}')">`).join('')
             : '';
         
         const userName = post.user?.name || post.userName || 'Usuario desconocido';
@@ -62,17 +92,20 @@ function renderPosts(posts, container) {
         const createdAt = formatDate(post.createdAt || post.created_at);
         const postContent = post.content ? escapeHtml(post.content) : '';
         const postId = escapeHtml(post.id);
+        const imageCount = images.length > 4 ? `+${images.length - 4}` : '';
         
         return `<div class="post-card" data-post-id="${postId}">
-            <div class="post-header">
-                <div class="post-user-info">
-                    <span class="user-name">${escapeHtml(userName)}</span>
-                    ${userId ? `<span class="user-id">ID: ${escapeHtml(String(userId))}</span>` : ''}
+            <div class="post-content-wrapper">
+                <div class="post-header">
+                    <div class="post-user-info">
+                        <span class="user-name">${escapeHtml(userName)}</span>
+                        ${userId ? `<span class="user-id">ID: ${escapeHtml(String(userId))}</span>` : ''}
+                    </div>
+                    <span class="post-date">${escapeHtml(createdAt)}</span>
                 </div>
-                <span class="post-date">${escapeHtml(createdAt)}</span>
+                ${postContent ? `<div class="post-content"><p>${postContent}</p></div>` : ''}
+                ${imagesHTML ? `<div class="post-images">${imagesHTML}${imageCount ? `<span class="image-count">${imageCount}</span>` : ''}</div>` : ''}
             </div>
-            ${postContent ? `<div class="post-content"><p>${postContent}</p></div>` : ''}
-            ${imagesHTML ? `<div class="post-images">${imagesHTML}</div>` : ''}
             <div class="post-actions">
                 <button class="btn btn-approve" onclick="handleApprovePost('${postId}')">Aprobar</button>
                 <button class="btn btn-reject" onclick="handleRejectPost('${postId}')">Rechazar</button>
@@ -175,6 +208,10 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+function viewImage(imageUrl) {
+    window.open(imageUrl, '_blank');
 }
 
 async function loadPosts() {
