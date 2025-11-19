@@ -1,12 +1,12 @@
 /**
  * Estilos para el Panel de Moderación Beecy
- * Diseño moderno, limpio y responsive - Modo Oscuro
+ * Diseño moderno, limpio y responsive - Soporte para Modo Oscuro y Claro
  */
 
 /* Importar fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
 
-/* Variables CSS - Modo Oscuro */
+/* Variables CSS - Modo Oscuro (default) */
 :root {
     --primary-color: #4F46E5;
     --primary-hover: #4338CA;
@@ -23,6 +23,28 @@
     --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --transition: all 0.2s ease-in-out;
+}
+
+/* Variables CSS - Modo Claro */
+:root[data-theme="light"] {
+    --primary-color: #4F46E5;
+    --primary-hover: #4338CA;
+    --approve-color: #00C851;
+    --approve-hover: #00A843;
+    --reject-color: #ff4444;
+    --reject-hover: #e63939;
+    --background: #FFFFFF;
+    --surface: #F5F5F5;
+    --surface-elevated: #E8E8E8;
+    --text-primary: #121212;
+    --text-secondary: #666666;
+    --border-color: #D0D0D0;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --radius: 8px;
     --radius-lg: 12px;
     --transition: all 0.2s ease-in-out;
@@ -64,7 +86,7 @@ body {
 .verify-card {
     background: var(--surface);
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-lg);
     padding: 60px 50px;
     width: 100%;
     border: 1px solid var(--border-color);
@@ -349,14 +371,14 @@ body {
 
 .error-message {
     background-color: rgba(255, 68, 68, 0.15);
-    color: #ff6b6b;
+    color: var(--reject-color);
     border-color: rgba(255, 68, 68, 0.3);
     box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
 }
 
 .success-message {
     background-color: rgba(0, 200, 81, 0.15);
-    color: #00C851;
+    color: var(--approve-color);
     border-color: rgba(0, 200, 81, 0.3);
     box-shadow: 0 2px 8px rgba(0, 200, 81, 0.2);
 }
@@ -609,6 +631,21 @@ body {
         flex: 1;
         max-width: 120px;
     }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .btn-settings,
+    .btn-logout {
+        width: 100%;
+    }
+    
+    .theme-selector {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 480px) {
@@ -644,6 +681,98 @@ body {
     .post-card {
         padding: 16px;
     }
+}
+
+/* Configuración de Tema */
+.theme-selector {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.theme-option {
+    flex: 1;
+    padding: 20px;
+    background: var(--surface);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.theme-option:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-option.active {
+    border-color: var(--primary-color);
+    background: rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.theme-option-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.theme-option-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.theme-option-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.settings-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 24px;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-settings {
+    background-color: var(--surface-elevated);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    width: auto;
+    padding: 8px 16px;
+}
+
+.btn-settings:hover {
+    background-color: var(--surface);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* Utilidades */

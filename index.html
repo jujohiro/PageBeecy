@@ -13,7 +13,11 @@
         <header class="app-header">
             <div class="header-content">
                 <h1>Beecy Admin</h1>
-                <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
+                <div class="header-actions">
+                    <button class="btn btn-settings"
+                        onclick="window.location.href='settings.html'">Configuración</button>
+                    <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
+                </div>
             </div>
         </header>
         <main class="app-main">
@@ -33,6 +37,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             requireAuth();
+            initTheme();
             loadPosts();
         });
     </script>

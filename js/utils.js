@@ -92,3 +92,47 @@ function clearMessage(container) {
     container.innerHTML = '';
     container.style.display = 'none';
 }
+
+/* Funciones de gestión de tema */
+function getTheme() {
+    try {
+        const theme = localStorage.getItem('theme_preference');
+        return theme === 'light' ? 'light' : 'dark';
+    } catch (error) {
+        console.error('Error al obtener tema:', error);
+        return 'dark';
+    }
+}
+
+function setTheme(theme) {
+    try {
+        if (theme !== 'light' && theme !== 'dark') {
+            theme = 'dark';
+        }
+        localStorage.setItem('theme_preference', theme);
+        applyTheme(theme);
+    } catch (error) {
+        console.error('Error al guardar tema:', error);
+    }
+}
+
+function applyTheme(theme) {
+    const root = document.documentElement;
+    if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+    } else {
+        root.removeAttribute('data-theme');
+    }
+}
+
+function initTheme() {
+    const theme = getTheme();
+    applyTheme(theme);
+}
+
+function toggleTheme() {
+    const currentTheme = getTheme();
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    return newTheme;
+}

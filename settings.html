@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beecy Admin - Configuración</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Beecy Admin</h1>
+                <div class="header-actions">
+                    <button class="btn btn-settings" onclick="window.location.href='index.html'">Volver al
+                        Panel</button>
+                    <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+        </header>
+        <main class="app-main">
+            <div class="main-content">
+                <div class="page-header">
+                    <h2>Configuración</h2>
+                    <p class="page-description">Personaliza la apariencia del panel de administración</p>
+                </div>
+                <div id="message-container" class="message-container"></div>
+                <div class="settings-card">
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Tema de la Aplicación</h3>
+                        <p class="page-description" style="margin-bottom: 24px;">Elige entre modo oscuro o claro según
+                            tu preferencia</p>
+                        <div class="theme-selector">
+                            <div class="theme-option" id="theme-dark" onclick="selectTheme('dark')">
+                                <span class="theme-option-icon">🌙</span>
+                                <div class="theme-option-title">Modo Oscuro</div>
+                                <div class="theme-option-description">Ideal para trabajar en ambientes con poca luz
+                                </div>
+                            </div>
+                            <div class="theme-option" id="theme-light" onclick="selectTheme('light')">
+                                <span class="theme-option-icon">☀️</span>
+                                <div class="theme-option-title">Modo Claro</div>
+                                <div class="theme-option-description">Ideal para trabajar en ambientes con mucha luz
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function selectTheme(theme) {
+            setTheme(theme);
+            updateThemeSelector(theme);
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                const themeName = theme === 'dark' ? 'oscuro' : 'claro';
+                showSuccess(`Tema ${themeName} aplicado correctamente`, messageContainer);
+            }
+        }
+
+        function updateThemeSelector(activeTheme) {
+            const darkOption = document.getElementById('theme-dark');
+            const lightOption = document.getElementById('theme-light');
+
+            if (darkOption && lightOption) {
+                darkOption.classList.toggle('active', activeTheme === 'dark');
+                lightOption.classList.toggle('active', activeTheme === 'light');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            requireAuth();
+            initTheme();
+            const currentTheme = getTheme();
+            updateThemeSelector(currentTheme);
+        });
+    </script>
+</body>
+
+</html>
