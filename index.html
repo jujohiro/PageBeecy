@@ -4,40 +4,840 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beecy Admin - Panel</title>
+    <title>Beecy Admin - Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Estilos para Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 256px;
+            height: 100vh;
+            background: var(--surface-elevated);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-user-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-nav-link:hover {
+            background: var(--surface);
+        }
+
+        .sidebar-nav-link.active {
+            background: rgba(79, 70, 229, 0.3);
+            color: var(--primary-color);
+        }
+
+        .sidebar-nav-link .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+        /* Main Content con margen para sidebar */
+        .main-wrapper {
+            margin-left: 256px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .top-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: var(--surface);
+            border-color: var(--primary-color);
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 32px;
+        }
+
+        .page-heading {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            letter-spacing: -0.033em;
+        }
+
+        /* Cards */
+        .admin-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            letter-spacing: -0.015em;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 24px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            width: 100%;
+            height: 48px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--surface-elevated);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            background: var(--surface);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .admin-table thead {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table th {
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .admin-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .admin-table tbody tr:hover {
+            background: var(--surface-elevated);
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(0, 200, 81, 0.15);
+            color: var(--approve-color);
+        }
+
+        .status-suspended {
+            background: rgba(255, 193, 7, 0.15);
+            color: #FFC107;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .table-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: var(--transition);
+        }
+
+        .table-btn:hover {
+            opacity: 0.8;
+        }
+
+        .table-btn.delete {
+            color: var(--reject-color);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            background: var(--surface);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            width: auto;
+            padding: 12px 24px;
+            margin: 0;
+            min-width: 120px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            width: auto;
+            margin: 0;
+            min-width: 120px;
+        }
+
+        /* Secciones del Dashboard */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .page-heading {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <div class="header-content">
-                <h1>Beecy Admin</h1>
-                <div class="header-actions">
-                    <button class="btn btn-settings"
-                        onclick="window.location.href='settings.html'">Configuración</button>
-                    <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="user-avatar-initial">A</div>
+                <div class="sidebar-user-info">
+                    <h1 id="user-name-sidebar">Administrador</h1>
+                    <p>Administrator</p>
                 </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-link active" onclick="showSection('moderation', this)">
+                    <span class="material-symbols-outlined">gavel</span>
+                    <span>Panel de Moderación</span>
+                </button>
+                <button class="sidebar-nav-link" onclick="showSection('users', this)">
+                    <span class="material-symbols-outlined">group</span>
+                    <span>Gestión de Usuarios</span>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <h2>Dashboard</h2>
+            <div class="top-header-actions">
+                <button class="icon-btn" onclick="window.location.href='settings.html'" title="Configuración">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
+                <button class="icon-btn" onclick="logout()" title="Cerrar Sesión">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
             </div>
         </header>
-        <main class="app-main">
-            <div class="main-content">
-                <div class="page-header">
-                    <h2>Panel de Moderación</h2>
-                </div>
-                <div id="message-container" class="message-container"></div>
+
+        <!-- Content -->
+        <div class="content-area">
+            <div id="message-container" class="message-container"></div>
+
+            <!-- Sección de Moderación -->
+            <div id="moderation-section" class="dashboard-section active">
+                <h1 class="page-heading">Panel de Moderación</h1>
                 <div id="posts-container" class="posts-container"></div>
             </div>
-        </main>
+
+            <!-- Sección de Gestión de Usuarios -->
+            <div id="users-section" class="dashboard-section">
+                <h1 class="page-heading">Gestión de Usuarios</h1>
+
+                <!-- Search and User List Section -->
+                <div class="admin-card">
+                    <h2>Buscar Usuario</h2>
+                    <!-- Search Bar -->
+                    <div class="search-container">
+                        <div class="search-wrapper">
+                            <div class="search-icon">
+                                <span class="material-symbols-outlined">search</span>
+                            </div>
+                            <input type="tel" class="search-input" id="search-phone-input"
+                                placeholder="Buscar por número de teléfono..."
+                                onkeypress="if(event.key === 'Enter') handleSearchUser()">
+                        </div>
+                    </div>
+
+                    <!-- User List Table -->
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Estado</th>
+                                    <th style="text-align: right;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr>
+                                    <td colspan="5"
+                                        style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                                        Busca un usuario por número de teléfono para ver la información
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Create New User Section -->
+                <div class="admin-card">
+                    <h2>Crear Nuevo Usuario</h2>
+                    <form id="create-user-form" onsubmit="handleCreateUser(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="new-username">Nombre de Usuario</label>
+                                <input type="text" id="new-username" name="username" placeholder="Ej: jane_doe"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-email">Dirección de Email</label>
+                                <input type="email" id="new-email" name="email" placeholder="Ej: user@example.com"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-phone">Número de Teléfono</label>
+                                <input type="tel" id="new-phone" name="phone" placeholder="Ej: +1234567890" required
+                                    pattern="^\+[1-9]\d{9,14}$">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-role">Rol</label>
+                                <select id="new-role" name="role" required>
+                                    <option value="user">Usuario</option>
+                                    <option value="editor">Editor</option>
+                                    <option value="administrator">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label for="new-password">Contraseña</label>
+                                <input type="password" id="new-password" name="password"
+                                    placeholder="Ingresa una contraseña segura" required>
+                            </div>
+                            <div class="form-group form-group-full">
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="resetCreateUserForm()">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="create-user-btn">
+                                        Crear Usuario
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script src="js/utils.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/posts.js"></script>
+    <script src="js/users.js"></script>
     <script>
+        // Navegación entre secciones
+        function showSection(sectionId, clickedElement) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            const targetSection = document.getElementById(`${sectionId}-section`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Actualizar enlaces activos del sidebar
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+
+            // Cargar datos de la sección si es necesario
+            if (sectionId === 'moderation') {
+                loadPosts();
+            }
+        }
+
+        // Función de búsqueda de usuarios
+        async function handleSearchUser() {
+            const searchInput = document.getElementById('search-phone-input');
+            const messageContainer = document.getElementById('message-container');
+            const tableBody = document.getElementById('users-table-body');
+
+            if (!searchInput) return;
+
+            const phone = searchInput.value.trim();
+            const formattedPhone = formatPhone(phone);
+
+            if (!validatePhone(formattedPhone)) {
+                showError('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)', messageContainer);
+                searchInput.focus();
+                return;
+            }
+
+            clearMessage(messageContainer);
+
+            try {
+                const user = await getUserByPhone(formattedPhone);
+                displayUserInTable(user, tableBody);
+                showSuccess('Usuario encontrado correctamente', messageContainer);
+            } catch (error) {
+                showError(error.message || 'Error al buscar usuario. Verifica el número de teléfono.', messageContainer);
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                                Usuario no encontrado
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+
+        function displayUserInTable(user, tableBody) {
+            if (!tableBody) return;
+
+            const userName = user.name || user.username || 'No disponible';
+            const userEmail = user.email || 'No disponible';
+            const userPhone = user.phone || user.phoneNumber || 'No disponible';
+            const userStatus = user.status || 'active';
+            const userId = user.id || user._id || '';
+
+            const avatarInitial = userName.charAt(0).toUpperCase();
+            const statusBadge = userStatus === 'active' || userStatus === 'activo'
+                ? '<span class="status-badge status-active">Activo</span>'
+                : '<span class="status-badge status-suspended">Suspendido</span>';
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">${escapeHtml(avatarInitial)}</div>
+                            <span>${escapeHtml(userName)}</span>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(userEmail)}</td>
+                    <td>${escapeHtml(userPhone)}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="table-btn" onclick="handleEditUser('${escapeHtml(userId)}')">
+                                Editar
+                            </button>
+                            <button class="table-btn delete" onclick="handleDeleteUser('${escapeHtml(userId)}')">
+                                Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        async function handleCreateUser(event) {
+            event.preventDefault();
+            const messageContainer = document.getElementById('message-container');
+            const createBtn = document.getElementById('create-user-btn');
+
+            const formData = {
+                username: document.getElementById('new-username').value.trim(),
+                email: document.getElementById('new-email').value.trim(),
+                phone: formatPhone(document.getElementById('new-phone').value.trim()),
+                role: document.getElementById('new-role').value,
+                password: document.getElementById('new-password').value
+            };
+
+            if (!validatePhone(formData.phone)) {
+                showError('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)', messageContainer);
+                return;
+            }
+
+            createBtn.disabled = true;
+            createBtn.textContent = 'Creando...';
+            clearMessage(messageContainer);
+
+            try {
+                await createUser(formData);
+                showSuccess('Usuario creado correctamente', messageContainer);
+                resetCreateUserForm();
+                const searchInput = document.getElementById('search-phone-input');
+                if (searchInput && searchInput.value) {
+                    searchInput.value = formData.phone;
+                    await handleSearchUser();
+                }
+            } catch (error) {
+                showError(error.message || 'Error al crear usuario', messageContainer);
+            } finally {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Crear Usuario';
+            }
+        }
+
+        function resetCreateUserForm() {
+            const form = document.getElementById('create-user-form');
+            if (form) {
+                form.reset();
+            }
+        }
+
+        async function handleEditUser(userId) {
+            window.location.href = `settings.html?user=${userId}`;
+        }
+
+        async function handleDeleteUser(userId) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            const messageContainer = document.getElementById('message-container');
+            clearMessage(messageContainer);
+
+            try {
+                await deleteUser(userId);
+                showSuccess('Usuario eliminado correctamente', messageContainer);
+                const tableBody = document.getElementById('users-table-body');
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                                Usuario eliminado. Busca otro usuario para continuar.
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                showError(error.message || 'Error al eliminar usuario', messageContainer);
+            }
+        }
+
+        async function loadCurrentUserInfo() {
+            try {
+                const userId = localStorage.getItem('user_id');
+                if (userId) {
+                    const userName = localStorage.getItem('user_name') || 'Administrador';
+                    const avatarInitial = userName.charAt(0).toUpperCase();
+
+                    const avatarEl = document.getElementById('user-avatar-initial');
+                    const nameEl = document.getElementById('user-name-sidebar');
+
+                    if (avatarEl) avatarEl.textContent = avatarInitial;
+                    if (nameEl) nameEl.textContent = userName;
+                }
+            } catch (error) {
+                console.error('Error al cargar información del usuario:', error);
+            }
+        }
+
+        function setupSearchInput() {
+            const searchInput = document.getElementById('search-phone-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function (e) {
+                    let value = e.target.value;
+                    value = value.replace(/[^\d+]/g, '');
+                    if (value && !value.startsWith('+')) {
+                        value = '+' + value.replace(/^\+/, '');
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            const phoneInput = document.getElementById('new-phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function (e) {
+                    let value = e.target.value;
+                    value = value.replace(/[^\d+]/g, '');
+                    if (value && !value.startsWith('+')) {
+                        value = '+' + value.replace(/^\+/, '');
+                    }
+                    e.target.value = value;
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             requireAuth();
             initTheme();
+            loadCurrentUserInfo();
+            setupSearchInput();
             loadPosts();
         });
     </script>
