@@ -513,7 +513,7 @@
                                 style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--text-secondary);">
                                 País (Opcional)
                             </label>
-                            <select id="search-country" name="search-country" onchange="updateSearchPhonePrefix()"
+                            <select id="search-country" name="search-country"
                                 style="width: 100%; padding: 12px 16px; font-size: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); background: var(--surface-elevated); color: var(--text-primary);">
                                 <option value="">Seleccionar país</option>
                                 <!-- Los países se cargarán dinámicamente -->
@@ -523,15 +523,14 @@
                             <div class="search-icon">
                                 <span class="material-symbols-outlined">search</span>
                             </div>
-                            <div style="display: flex; gap: 8px; flex: 1; align-items: center;">
-                                <input type="text" id="search-phone-prefix" placeholder="+XX" readonly
-                                    style="flex: 0 0 auto; width: 80px; text-align: center; background: var(--surface); cursor: not-allowed; border: none; padding: 0 8px; color: var(--text-secondary); font-size: 14px;">
-                                <input type="tel" class="search-input" id="search-phone-input"
-                                    placeholder="Buscar por número de teléfono..."
-                                    onkeypress="if(event.key === 'Enter') handleSearchUser()"
-                                    style="flex: 1; border: none; padding: 12px 8px;">
-                            </div>
+                            <input type="tel" class="search-input" id="search-phone-input"
+                                placeholder="Buscar por número de teléfono (sin indicativo si seleccionaste país)..."
+                                onkeypress="if(event.key === 'Enter') handleSearchUser()">
                         </div>
+                        <small style="display: block; margin-top: 8px; color: var(--text-secondary); font-size: 12px;">
+                            Si seleccionas un país, ingresa solo el número sin indicativo. El indicativo se agregará
+                            automáticamente.
+                        </small>
                     </div>
 
                     <!-- User List Table -->
@@ -575,25 +574,18 @@
                             </div>
                             <div class="form-group">
                                 <label for="new-country">País</label>
-                                <select id="new-country" name="country" onchange="updatePhonePrefix()" required>
+                                <select id="new-country" name="country" required>
                                     <option value="">Seleccionar país</option>
                                     <!-- Los países se cargarán dinámicamente -->
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="new-phone">Número de Teléfono</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <div style="flex: 0 0 auto; min-width: 100px;">
-                                        <input type="text" id="new-phone-prefix" name="phone-prefix" placeholder="+XX"
-                                            readonly
-                                            style="text-align: center; background: var(--surface); cursor: not-allowed;">
-                                    </div>
-                                    <input type="tel" id="new-phone" name="phone" placeholder="Número sin indicativo"
-                                        required pattern="^\+[1-9]\d{9,14}$">
-                                </div>
+                                <input type="tel" id="new-phone" name="phone"
+                                    placeholder="Ingresa el número sin indicativo" required>
                                 <small
                                     style="display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px;">
-                                    El indicativo se agregará automáticamente al seleccionar el país
+                                    El indicativo del país seleccionado se agregará automáticamente
                                 </small>
                             </div>
                             <div class="form-group">
@@ -661,12 +653,10 @@
 
         // Función para obtener el número completo de búsqueda
         function getFullSearchPhoneNumber() {
-            const prefixInput = document.getElementById('search-phone-prefix');
             const phoneInput = document.getElementById('search-phone-input');
 
             if (!phoneInput) return '';
 
-            const prefix = prefixInput ? prefixInput.value.trim() : '';
             let number = phoneInput.value.trim();
 
             // Si el número ya tiene el formato completo con +, usarlo directamente
@@ -677,18 +667,16 @@
             // Remover cualquier carácter no numérico
             number = number.replace(/[^\d]/g, '');
 
+            // Obtener el prefijo del país seleccionado
+            const prefix = getSelectedCountryPrefix('search-country');
+
             // Combinar prefijo y número si ambos existen
             if (prefix && number) {
                 return prefix + number;
             }
 
-            // Si solo hay número sin prefijo, asumir que ya tiene el formato correcto
-            if (number && !number.startsWith('+')) {
-                // Intentar usar el formato completo del input original
-                return phoneInput.value.trim();
-            }
-
-            return '';
+            // Si no hay prefijo pero hay número, devolver como está
+            return number;
         }
 
         // Función de búsqueda de usuarios
@@ -834,13 +822,6 @@
             const form = document.getElementById('create-user-form');
             if (form) {
                 form.reset();
-            }
-            // Resetear el prefijo telefónico
-            const prefixInput = document.getElementById('new-phone-prefix');
-            const phoneInput = document.getElementById('new-phone');
-            if (prefixInput) prefixInput.value = '';
-            if (phoneInput) {
-                phoneInput.placeholder = 'Número sin indicativo';
             }
         }
 
@@ -1004,84 +985,46 @@
             }
         }
 
-        // Función para actualizar el prefijo telefónico en la búsqueda
-        function updateSearchPhonePrefix() {
-            const countrySelect = document.getElementById('search-country');
-            const prefixInput = document.getElementById('search-phone-prefix');
-            const phoneInput = document.getElementById('search-phone-input');
 
-            if (!countrySelect || !prefixInput || !phoneInput) return;
+        // Función para obtener el prefijo del país seleccionado
+        function getSelectedCountryPrefix(countrySelectId) {
+            const countrySelect = document.getElementById(countrySelectId);
+            if (!countrySelect) return '';
 
             const selectedOption = countrySelect.options[countrySelect.selectedIndex];
             if (selectedOption && selectedOption.dataset.prefix) {
-                const prefix = selectedOption.dataset.prefix;
-                prefixInput.value = prefix;
-
-                // Si el campo ya tiene un valor que comienza con el prefijo, removerlo
-                let currentValue = phoneInput.value.trim();
-                if (currentValue.startsWith(prefix)) {
-                    currentValue = currentValue.substring(prefix.length);
-                }
-                // Remover cualquier otro prefijo que pueda tener
-                currentValue = currentValue.replace(/^\+\d+/, '');
-                phoneInput.value = currentValue;
-            } else {
-                prefixInput.value = '';
+                return selectedOption.dataset.prefix;
             }
-        }
-
-        // Función para actualizar el prefijo telefónico cuando se selecciona un país
-        function updatePhonePrefix() {
-            const countrySelect = document.getElementById('new-country');
-            const prefixInput = document.getElementById('new-phone-prefix');
-            const phoneInput = document.getElementById('new-phone');
-
-            if (!countrySelect || !prefixInput || !phoneInput) return;
-
-            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
-            if (selectedOption && selectedOption.dataset.prefix) {
-                const prefix = selectedOption.dataset.prefix;
-                prefixInput.value = prefix;
-
-                // Actualizar placeholder del campo de teléfono
-                const countryName = selectedOption.textContent.split(' (')[0];
-                phoneInput.placeholder = `Número de ${countryName} sin indicativo`;
-
-                // Si el campo ya tiene un valor que comienza con el prefijo, removerlo
-                let currentValue = phoneInput.value.trim();
-                if (currentValue.startsWith(prefix)) {
-                    currentValue = currentValue.substring(prefix.length);
-                }
-                // Remover cualquier otro prefijo que pueda tener
-                currentValue = currentValue.replace(/^\+\d+/, '');
-                phoneInput.value = currentValue;
-
-                phoneInput.focus();
-            } else {
-                prefixInput.value = '';
-                phoneInput.placeholder = 'Número sin indicativo';
-            }
+            return '';
         }
 
         // Función para formatear el número de teléfono completo antes de enviar
         function getFullPhoneNumber() {
-            const prefixInput = document.getElementById('new-phone-prefix');
+            const countrySelect = document.getElementById('new-country');
             const phoneInput = document.getElementById('new-phone');
 
-            if (!prefixInput || !phoneInput) return '';
+            if (!phoneInput) return '';
 
-            const prefix = prefixInput.value.trim();
             let number = phoneInput.value.trim();
 
-            // Remover cualquier carácter no numérico excepto el + inicial
+            // Si ya tiene formato completo con +, usarlo directamente
+            if (number.startsWith('+')) {
+                return number;
+            }
+
+            // Remover cualquier carácter no numérico
             number = number.replace(/[^\d]/g, '');
+
+            // Obtener el prefijo del país seleccionado
+            const prefix = getSelectedCountryPrefix('new-country');
 
             // Combinar prefijo y número
             if (prefix && number) {
                 return prefix + number;
             }
 
-            return phoneInput.value.trim();
+            // Si no hay prefijo pero hay número, devolver como está (puede tener formato completo)
+            return number;
         }
 
         function setupSearchInput() {
@@ -1089,9 +1032,9 @@
             if (searchInput) {
                 searchInput.addEventListener('input', function (e) {
                     let value = e.target.value;
-                    // Si hay un prefijo seleccionado, solo permitir números
-                    const prefixInput = document.getElementById('search-phone-prefix');
-                    if (prefixInput && prefixInput.value.trim()) {
+                    // Si hay un país seleccionado, solo permitir números
+                    const countrySelect = document.getElementById('search-country');
+                    if (countrySelect && countrySelect.value) {
                         // Solo números, sin el signo +
                         value = value.replace(/[^\d]/g, '');
                     } else {
@@ -1109,8 +1052,18 @@
             if (phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
                     let value = e.target.value;
-                    // Solo permitir números, no el signo + porque viene del prefijo
-                    value = value.replace(/[^\d]/g, '');
+                    // Si hay un país seleccionado, solo permitir números
+                    const countrySelect = document.getElementById('new-country');
+                    if (countrySelect && countrySelect.value) {
+                        // Solo números, sin el signo +
+                        value = value.replace(/[^\d]/g, '');
+                    } else {
+                        // Permitir formato completo con +
+                        value = value.replace(/[^\d+]/g, '');
+                        if (value && !value.startsWith('+')) {
+                            value = '+' + value.replace(/^\+/, '');
+                        }
+                    }
                     e.target.value = value;
                 });
             }
