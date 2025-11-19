@@ -88,3 +88,54 @@ function requireAuth() {
         window.location.href = loginPath;
     }
 }
+
+async function getUserByPhone(phoneNumber) {
+    const formattedPhone = formatPhone(phoneNumber);
+    if (!validatePhone(formattedPhone)) {
+        throw new Error('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)');
+    }
+    
+    const response = await apiGet(`/auth/get-user?phone=${encodeURIComponent(formattedPhone)}`, true);
+    
+    if (!response) {
+        throw new Error('No se recibió respuesta del servidor.');
+    }
+    
+    return response;
+}
+
+async function changePhone(newPhone, otp) {
+    const formattedPhone = formatPhone(newPhone);
+    if (!validatePhone(formattedPhone)) {
+        throw new Error('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)');
+    }
+    
+    if (!validateOTP(otp)) {
+        throw new Error('El código OTP debe tener 6 dígitos');
+    }
+    
+    const response = await apiPost('/auth/change-phone', {
+        phone: formattedPhone,
+        otp: otp
+    }, true, 'form');
+    
+    if (!response) {
+        throw new Error('No se recibió respuesta del servidor.');
+    }
+    
+    return response;
+}
+
+async function updateProfile(userId, profileData) {
+    if (!userId) {
+        throw new Error('ID de usuario requerido');
+    }
+    
+    const response = await apiPut(`/auth/update-profile/${userId}`, profileData, true);
+    
+    if (!response) {
+        throw new Error('No se recibió respuesta del servidor.');
+    }
+    
+    return response;
+}
