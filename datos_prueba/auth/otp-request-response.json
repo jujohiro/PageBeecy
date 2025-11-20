@@ -1,0 +1,8 @@
+{
+  "message": "Código OTP enviado correctamente",
+  "otp": "123456",
+  "phone": "+573001234567",
+  "expiresIn": 300,
+  "testMode": true
+}
+

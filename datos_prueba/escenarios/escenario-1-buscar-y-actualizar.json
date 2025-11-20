@@ -1,0 +1,61 @@
+{
+  "nombre": "Escenario 1: Buscar y Actualizar Usuario",
+  "descripcion": "Flujo completo para buscar un usuario por teléfono y actualizar sus datos",
+  "pasos": [
+    {
+      "paso": 1,
+      "endpoint": "POST /admin/user/by-phone",
+      "request": {
+        "phone": "+573001234567"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "user_123456",
+          "name": "Juan Pérez",
+          "email": "juan.perez@example.com",
+          "phone": "+573001234567",
+          "birthDate": "1990-05-15T00:00:00.000Z",
+          "age": 34,
+          "gender": "male",
+          "biography": "Desarrollador de software apasionado",
+          "image": "https://example.com/profile/user_123456.jpg",
+          "isVerified": true,
+          "isActive": true,
+          "referralCode": "ABC123",
+          "createdAt": "2023-01-15T10:30:00.000Z",
+          "updatedAt": "2024-12-01T14:20:00.000Z",
+          "lastLogin": "2024-12-15T09:15:00.000Z",
+          "verificationStatus": "verified",
+          "role": "user"
+        }
+      }
+    },
+    {
+      "paso": 2,
+      "endpoint": "POST /admin/user/update",
+      "request": {
+        "userId": "user_123456",
+        "name": "Juan Carlos Pérez Actualizado",
+        "email": "nuevo.email@example.com",
+        "biography": "Biografía actualizada"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Usuario actualizado exitosamente",
+          "data": {
+            "id": "user_123456",
+            "name": "Juan Carlos Pérez Actualizado",
+            "email": "nuevo.email@example.com",
+            "phone": "+573001234567",
+            "biography": "Biografía actualizada",
+            "updatedAt": "2024-12-15T16:45:00.000Z"
+          }
+        }
+      }
+    }
+  ]
+}
+

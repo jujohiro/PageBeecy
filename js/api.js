@@ -33,6 +33,14 @@ const BASE_URL = getBackendUrl();
 
 async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = false, contentType = 'json') {
     try {
+        // Interceptar en modo de pruebas
+        if (typeof interceptTestRequest === 'function') {
+            const testResponse = await interceptTestRequest(endpoint, method, data);
+            if (testResponse !== null) {
+                return testResponse;
+            }
+        }
+        
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
         const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${cleanEndpoint}`;
         const headers = {};
@@ -82,12 +90,17 @@ async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = 
         }
         
         if (!response.ok) {
-            const errorMessage = typeof responseData === 'object' && responseData?.message
+            const errorMessage = typeof responseData === 'object' && responseData?.error
+                ? responseData.error
+                : typeof responseData === 'object' && responseData?.message
                 ? responseData.message
                 : `Error ${response.status}: ${response.statusText}`;
             
             const error = new Error(errorMessage);
             error.status = response.status;
+            if (responseData.details) {
+                error.details = responseData.details;
+            }
             throw error;
         }
         

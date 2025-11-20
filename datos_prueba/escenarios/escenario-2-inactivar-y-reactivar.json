@@ -1,0 +1,68 @@
+{
+  "nombre": "Escenario 2: Inactivar y Reactivar Usuario",
+  "descripcion": "Flujo completo para buscar, inactivar y reactivar un usuario",
+  "pasos": [
+    {
+      "paso": 1,
+      "endpoint": "POST /admin/user/by-phone",
+      "request": {
+        "phone": "+573001234567"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "user_123456",
+          "name": "Juan Pérez",
+          "phone": "+573001234567",
+          "isActive": true
+        }
+      }
+    },
+    {
+      "paso": 2,
+      "endpoint": "POST /admin/user/deactivate",
+      "request": {
+        "userId": "user_123456",
+        "reason": "Violación de términos de servicio",
+        "notes": "Usuario reportado por spam"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Usuario inactivado exitosamente",
+          "data": {
+            "id": "user_123456",
+            "isActive": false,
+            "deactivatedAt": "2024-12-15T16:50:00.000Z",
+            "deactivationReason": "Violación de términos de servicio",
+            "deactivatedBy": "admin_user_789",
+            "deactivateUntil": null
+          }
+        }
+      }
+    },
+    {
+      "paso": 3,
+      "endpoint": "POST /admin/user/activate",
+      "request": {
+        "userId": "user_123456",
+        "notes": "Problema resuelto, usuario reactivado"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Usuario reactivado exitosamente",
+          "data": {
+            "id": "user_123456",
+            "isActive": true,
+            "reactivatedAt": "2024-12-15T17:00:00.000Z",
+            "reactivatedBy": "admin_user_789"
+          }
+        }
+      }
+    }
+  ]
+}
+

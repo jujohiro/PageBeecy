@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "message": "Usuario eliminado permanentemente",
+  "data": {
+    "id": "user_123456",
+    "deletedAt": "2024-12-15T17:05:00.000Z",
+    "deletedBy": "admin_user_789",
+    "deletionReason": "Eliminación solicitada por el usuario"
+  }
+}
+

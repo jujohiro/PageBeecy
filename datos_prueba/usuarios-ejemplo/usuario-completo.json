@@ -1,0 +1,20 @@
+{
+  "id": "user_123456",
+  "name": "Juan Pérez",
+  "email": "juan.perez@example.com",
+  "phone": "+573001234567",
+  "birthDate": "1990-05-15T00:00:00.000Z",
+  "age": 34,
+  "gender": "male",
+  "biography": "Desarrollador de software apasionado",
+  "image": "https://example.com/profile/user_123456.jpg",
+  "isVerified": true,
+  "isActive": true,
+  "referralCode": "ABC123",
+  "createdAt": "2023-01-15T10:30:00.000Z",
+  "updatedAt": "2024-12-01T14:20:00.000Z",
+  "lastLogin": "2024-12-15T09:15:00.000Z",
+  "verificationStatus": "verified",
+  "role": "user"
+}
+

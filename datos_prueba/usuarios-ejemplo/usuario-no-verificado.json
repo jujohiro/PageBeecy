@@ -1,0 +1,20 @@
+{
+  "id": "user_345678",
+  "name": "Carlos Rodríguez",
+  "email": "carlos.rodriguez@example.com",
+  "phone": "+573004567890",
+  "birthDate": "1988-11-05T00:00:00.000Z",
+  "age": 36,
+  "gender": "male",
+  "biography": "Emprendedor",
+  "image": "https://example.com/profile/user_345678.jpg",
+  "isVerified": false,
+  "isActive": true,
+  "referralCode": "DEF456",
+  "createdAt": "2024-11-20T08:15:00.000Z",
+  "updatedAt": "2024-11-20T08:15:00.000Z",
+  "lastLogin": "2024-12-14T16:45:00.000Z",
+  "verificationStatus": "pending",
+  "role": "user"
+}
+

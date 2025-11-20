@@ -1,0 +1,20 @@
+{
+  "id": "admin_test_001",
+  "name": "Admin de Prueba",
+  "email": "admin@test.beecy.app",
+  "phone": "+573001234567",
+  "birthDate": "1990-01-01T00:00:00.000Z",
+  "age": 34,
+  "gender": "male",
+  "biography": "Administrador de prueba del sistema",
+  "image": "https://example.com/profile/admin_test.jpg",
+  "isVerified": true,
+  "isActive": true,
+  "referralCode": "ADMIN001",
+  "createdAt": "2023-01-01T10:00:00.000Z",
+  "updatedAt": "2024-12-01T14:00:00.000Z",
+  "lastLogin": "2024-12-15T09:00:00.000Z",
+  "verificationStatus": "verified",
+  "role": "administrator"
+}
+

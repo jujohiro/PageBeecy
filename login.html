@@ -22,6 +22,17 @@
                 <div id="message-container" class="message-container"></div>
 
                 <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+                    <div id="test-mode-banner"
+                        style="display: none; background: rgba(255, 193, 7, 0.2); border: 1px solid #FFC107; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; color: #FFC107; font-weight: 600; font-size: 14px;">
+                            <span>🧪</span>
+                            <span>Modo de Pruebas Activo</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                            <strong>Admin:</strong> +573001234567 | <strong>OTP:</strong> 123456
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="phone">Número de Teléfono</label>
                         <input type="tel" id="phone" name="phone" placeholder="+573001234567" required
@@ -32,6 +43,14 @@
                     <button type="submit" class="btn btn-primary" id="submit-btn">
                         Continuar
                     </button>
+
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-secondary" id="test-mode-toggle"
+                            onclick="toggleTestModeFromLogin()" style="width: 100%; margin: 0;">
+                            <span id="test-mode-icon">🧪</span>
+                            <span id="test-mode-text">Activar Modo de Pruebas</span>
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -40,9 +59,49 @@
     <script src="js/utils.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/testing.js"></script>
     <script>
+        function toggleTestModeFromLogin() {
+            const currentMode = localStorage.getItem('test_mode') === 'true';
+            const newMode = !currentMode;
+            localStorage.setItem('test_mode', newMode ? 'true' : 'false');
+
+            updateTestModeUI(newMode);
+        }
+
+        function updateTestModeUI(enabled) {
+            const banner = document.getElementById('test-mode-banner');
+            const toggleBtn = document.getElementById('test-mode-toggle');
+            const icon = document.getElementById('test-mode-icon');
+            const text = document.getElementById('test-mode-text');
+
+            if (banner) {
+                banner.style.display = enabled ? 'block' : 'none';
+            }
+
+            if (toggleBtn) {
+                if (enabled) {
+                    toggleBtn.style.background = 'rgba(255, 193, 7, 0.2)';
+                    toggleBtn.style.borderColor = '#FFC107';
+                    toggleBtn.style.color = '#FFC107';
+                } else {
+                    toggleBtn.style.background = '';
+                    toggleBtn.style.borderColor = '';
+                    toggleBtn.style.color = '';
+                }
+            }
+
+            if (text) {
+                text.textContent = enabled ? 'Desactivar Modo de Pruebas' : 'Activar Modo de Pruebas';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             initTheme();
+
+            // Verificar modo de pruebas
+            const testMode = localStorage.getItem('test_mode') === 'true';
+            updateTestModeUI(testMode);
         });
 
         if (isAuthenticated()) {

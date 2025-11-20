@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "message": "Usuario reactivado exitosamente",
+  "data": {
+    "id": "user_123456",
+    "isActive": true,
+    "reactivatedAt": "2024-12-15T17:00:00.000Z",
+    "reactivatedBy": "admin_user_789"
+  }
+}
+

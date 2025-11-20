@@ -1,0 +1,478 @@
+Documentación de APIs y formatos JSON para el flujo de administración de usuarios:
+
+
+[2 tools called]
+
+
+# Documentación de APIs - Panel de Administración de Usuarios
+
+## Base URL y Autenticación
+
+**Base URL:** `${BASE_URL}/` (definida en `.env`)
+
+**Headers requeridos:**
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer {auth_token}",
+  "Accept-Language": "es|en|pt"
+}
+```
+
+---
+
+## Endpoints de Administración
+
+### 1. Buscar Usuario por Número de Teléfono
+
+**Endpoint:** `POST /admin/user/by-phone`
+
+**Descripción:** Busca un usuario por su número de teléfono.
+
+**Request Body:**
+```json
+{
+  "phone": "+573001234567"
+}
+```
+
+**Response 200 - Éxito:**
+```json
+{
+  "id": "user_123456",
+  "name": "Juan Pérez",
+  "email": "juan.perez@example.com",
+  "phone": "+573001234567",
+  "birthDate": "1990-05-15T00:00:00.000Z",
+  "age": 34,
+  "gender": "male",
+  "biography": "Desarrollador de software apasionado",
+  "image": "https://example.com/profile/user_123456.jpg",
+  "isVerified": true,
+  "isActive": true,
+  "referralCode": "ABC123",
+  "createdAt": "2023-01-15T10:30:00.000Z",
+  "updatedAt": "2024-12-01T14:20:00.000Z",
+  "lastLogin": "2024-12-15T09:15:00.000Z",
+  "verificationStatus": "verified",
+  "role": "user"
+}
+```
+
+**Response 404 - Usuario no encontrado:**
+```json
+{
+  "error": "Usuario no encontrado con el número de teléfono proporcionado"
+}
+```
+
+**Response 401 - No autorizado:**
+```json
+{
+  "error": "No autorizado. Se requieren permisos de administrador"
+}
+```
+
+**Response 400 - Datos inválidos:**
+```json
+{
+  "error": "El número de teléfono es requerido"
+}
+```
+
+---
+
+### 2. Actualizar Datos del Usuario
+
+**Endpoint:** `POST /admin/user/update`
+
+**Descripción:** Actualiza los datos de un usuario específico.
+
+**Request Body:**
+```json
+{
+  "userId": "user_123456",
+  "name": "Juan Carlos Pérez",
+  "email": "juan.carlos.perez@example.com",
+  "biography": "Desarrollador Full Stack con 10 años de experiencia",
+  "age": 35,
+  "gender": "male",
+  "birthDate": "1989-05-15T00:00:00.000Z",
+  "isVerified": true,
+  "verificationStatus": "verified",
+  "image": "https://example.com/profile/new_image.jpg"
+}
+```
+
+**Campos opcionales:** Todos los campos son opcionales excepto `userId`. Solo se actualizan los campos enviados.
+
+**Response 200 - Éxito:**
+```json
+{
+  "success": true,
+  "message": "Usuario actualizado exitosamente",
+  "data": {
+    "id": "user_123456",
+    "name": "Juan Carlos Pérez",
+    "email": "juan.carlos.perez@example.com",
+    "phone": "+573001234567",
+    "biography": "Desarrollador Full Stack con 10 años de experiencia",
+    "age": 35,
+    "gender": "male",
+    "birthDate": "1989-05-15T00:00:00.000Z",
+    "isVerified": true,
+    "verificationStatus": "verified",
+    "image": "https://example.com/profile/new_image.jpg",
+    "updatedAt": "2024-12-15T16:45:00.000Z"
+  }
+}
+```
+
+**Response 404 - Usuario no encontrado:**
+```json
+{
+  "error": "Usuario no encontrado"
+}
+```
+
+**Response 422 - Datos inválidos:**
+```json
+{
+  "error": "Datos inválidos",
+  "details": {
+    "email": "El formato del email no es válido",
+    "age": "La edad debe ser un número positivo"
+  }
+}
+```
+
+---
+
+### 3. Inactivar Usuario
+
+**Endpoint:** `POST /admin/user/deactivate`
+
+**Descripción:** Cambia el estado del usuario a inactivo. El usuario no podrá iniciar sesión.
+
+**Request Body:**
+```json
+{
+  "userId": "user_123456",
+  "reason": "Solicitud del usuario",
+  "notes": "Usuario solicitó desactivación temporal",
+  "deactivateUntil": null
+}
+```
+
+**Campos:**
+- `userId` (requerido): ID del usuario a inactivar
+- `reason` (opcional): Razón de la inactivación
+- `notes` (opcional): Notas adicionales
+- `deactivateUntil` (opcional): Fecha de reactivación automática (ISO 8601)
+
+**Response 200 - Éxito:**
+```json
+{
+  "success": true,
+  "message": "Usuario inactivado exitosamente",
+  "data": {
+    "id": "user_123456",
+    "isActive": false,
+    "deactivatedAt": "2024-12-15T16:50:00.000Z",
+    "deactivationReason": "Solicitud del usuario",
+    "deactivatedBy": "admin_user_789",
+    "deactivateUntil": null
+  }
+}
+```
+
+**Response 400 - Usuario ya inactivo:**
+```json
+{
+  "error": "El usuario ya está inactivo"
+}
+```
+
+---
+
+### 4. Reactivar Usuario
+
+**Endpoint:** `POST /admin/user/activate`
+
+**Descripción:** Reactiva un usuario previamente inactivado.
+
+**Request Body:**
+```json
+{
+  "userId": "user_123456",
+  "notes": "Usuario reactivado por solicitud"
+}
+```
+
+**Response 200 - Éxito:**
+```json
+{
+  "success": true,
+  "message": "Usuario reactivado exitosamente",
+  "data": {
+    "id": "user_123456",
+    "isActive": true,
+    "reactivatedAt": "2024-12-15T17:00:00.000Z",
+    "reactivatedBy": "admin_user_789"
+  }
+}
+```
+
+**Response 400 - Usuario ya activo:**
+```json
+{
+  "error": "El usuario ya está activo"
+}
+```
+
+---
+
+### 5. Eliminar Usuario Permanentemente
+
+**Endpoint:** `POST /admin/user/delete`
+
+**Descripción:** Elimina un usuario y todos sus datos asociados del sistema.
+
+**Request Body:**
+```json
+{
+  "userId": "user_123456",
+  "reason": "Eliminación solicitada por el usuario",
+  "confirmDelete": true,
+  "deleteRelatedData": true
+}
+```
+
+**Campos:**
+- `userId` (requerido): ID del usuario a eliminar
+- `reason` (requerido): Razón de la eliminación
+- `confirmDelete` (requerido): Debe ser `true` para confirmar
+- `deleteRelatedData` (opcional): Si eliminar datos relacionados (posts, chats, etc.). Default: `true`
+
+**Response 200 - Éxito:**
+```json
+{
+  "success": true,
+  "message": "Usuario eliminado permanentemente",
+  "data": {
+    "id": "user_123456",
+    "deletedAt": "2024-12-15T17:05:00.000Z",
+    "deletedBy": "admin_user_789",
+    "deletionReason": "Eliminación solicitada por el usuario"
+  }
+}
+```
+
+**Response 400 - Confirmación requerida:**
+```json
+{
+  "error": "Se requiere confirmación explícita para eliminar el usuario"
+}
+```
+
+**Response 409 - Conflicto:**
+```json
+{
+  "error": "No se puede eliminar el usuario. Tiene datos asociados que requieren atención manual"
+}
+```
+
+---
+
+## Flujo Completo de Administración
+
+### Escenario 1: Buscar y Actualizar Usuario
+
+**Paso 1: Buscar usuario por teléfono**
+```http
+POST /admin/user/by-phone
+Content-Type: application/json
+Authorization: Bearer {admin_token}
+
+{
+  "phone": "+573001234567"
+}
+```
+
+**Paso 2: Actualizar datos del usuario encontrado**
+```http
+POST /admin/user/update
+Content-Type: application/json
+Authorization: Bearer {admin_token}
+
+{
+  "userId": "user_123456",
+  "name": "Juan Carlos Pérez Actualizado",
+  "email": "nuevo.email@example.com",
+  "biography": "Biografía actualizada"
+}
+```
+
+---
+
+### Escenario 2: Inactivar y Reactivar Usuario
+
+**Paso 1: Buscar usuario**
+```http
+POST /admin/user/by-phone
+{
+  "phone": "+573001234567"
+}
+```
+
+**Paso 2: Inactivar usuario**
+```http
+POST /admin/user/deactivate
+{
+  "userId": "user_123456",
+  "reason": "Violación de términos de servicio",
+  "notes": "Usuario reportado por spam"
+}
+```
+
+**Paso 3: Reactivar usuario (opcional)**
+```http
+POST /admin/user/activate
+{
+  "userId": "user_123456",
+  "notes": "Problema resuelto, usuario reactivado"
+}
+```
+
+---
+
+### Escenario 3: Eliminar Usuario
+
+**Paso 1: Buscar usuario**
+```http
+POST /admin/user/by-phone
+{
+  "phone": "+573001234567"
+}
+```
+
+**Paso 2: Eliminar usuario**
+```http
+POST /admin/user/delete
+{
+  "userId": "user_123456",
+  "reason": "Solicitud de eliminación de cuenta",
+  "confirmDelete": true,
+  "deleteRelatedData": true
+}
+```
+
+---
+
+## Códigos de Estado HTTP
+
+| Código | Significado | Descripción |
+|--------|-------------|-------------|
+| 200 | OK | Operación exitosa |
+| 201 | Created | Recurso creado exitosamente |
+| 400 | Bad Request | Datos inválidos o faltantes |
+| 401 | Unauthorized | Token inválido o ausente |
+| 403 | Forbidden | Sin permisos de administrador |
+| 404 | Not Found | Usuario no encontrado |
+| 409 | Conflict | Conflicto con el estado actual |
+| 422 | Unprocessable Entity | Datos válidos pero no procesables |
+| 500 | Internal Server Error | Error del servidor |
+
+---
+
+## Estructura de Respuestas Estándar
+
+### Respuesta de Éxito
+```json
+{
+  "success": true,
+  "message": "Mensaje descriptivo",
+  "data": {
+    // Datos del recurso
+  }
+}
+```
+
+### Respuesta de Error
+```json
+{
+  "error": "Mensaje de error descriptivo",
+  "details": {
+    // Detalles adicionales (opcional)
+  }
+}
+```
+
+---
+
+## Validaciones Requeridas
+
+### Buscar por Teléfono
+- El número de teléfono debe tener formato válido
+- El número debe existir en el sistema
+
+### Actualizar Usuario
+- `userId` es requerido
+- `email` debe tener formato válido si se envía
+- `age` debe ser un número positivo si se envía
+- `birthDate` debe ser una fecha válida si se envía
+
+### Inactivar/Reactivar
+- `userId` es requerido
+- El usuario debe existir
+- No se puede inactivar un usuario ya inactivado
+- No se puede reactivar un usuario ya activo
+
+### Eliminar Usuario
+- `userId` es requerido
+- `reason` es requerido
+- `confirmDelete` debe ser `true`
+- El usuario debe existir
+
+---
+
+## Notas de Implementación
+
+1. Autenticación: Todos los endpoints requieren token de administrador en el header `Authorization`.
+2. Permisos: El backend debe validar que el usuario tenga rol de administrador.
+3. Logs: Se recomienda registrar todas las acciones administrativas.
+4. Formato de fechas: Usar ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).
+5. Números de teléfono: Formato internacional con código de país (ej: `+573001234567`).
+
+---
+
+## Ejemplo de Uso Completo (Postman/Insomnia)
+
+**Colección de requests:**
+
+1. **Buscar Usuario**
+   - Method: `POST`
+   - URL: `{{BASE_URL}}/admin/user/by-phone`
+   - Body: `{"phone": "+573001234567"}`
+
+2. **Actualizar Usuario**
+   - Method: `POST`
+   - URL: `{{BASE_URL}}/admin/user/update`
+   - Body: `{"userId": "{{userId}}", "name": "Nuevo Nombre"}`
+
+3. **Inactivar Usuario**
+   - Method: `POST`
+   - URL: `{{BASE_URL}}/admin/user/deactivate`
+   - Body: `{"userId": "{{userId}}", "reason": "Razón"}`
+
+4. **Reactivar Usuario**
+   - Method: `POST`
+   - URL: `{{BASE_URL}}/admin/user/activate`
+   - Body: `{"userId": "{{userId}}"}`
+
+5. **Eliminar Usuario**
+   - Method: `POST`
+   - URL: `{{BASE_URL}}/admin/user/delete`
+   - Body: `{"userId": "{{userId}}", "reason": "Razón", "confirmDelete": true}`
+
+Esta documentación cubre los endpoints y formatos JSON necesarios para implementar el panel de administración.

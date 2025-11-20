@@ -23,11 +23,23 @@
                 <div id="message-container" class="message-container"></div>
 
                 <form id="verify-form" class="verify-form" onsubmit="handleVerify(event)">
+                    <div id="test-mode-banner"
+                        style="display: none; background: rgba(255, 193, 7, 0.2); border: 1px solid #FFC107; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; color: #FFC107; font-weight: 600; font-size: 14px;">
+                            <span>🧪</span>
+                            <span>Modo de Pruebas: Usa OTP 123456</span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="otp">Código OTP</label>
                         <input type="text" id="otp" name="otp" placeholder="000000" required
                             autocomplete="one-time-code" maxlength="6" pattern="\d{6}" inputmode="numeric">
                         <small class="form-hint">Ingresa el código de 6 dígitos</small>
+                        <small id="test-otp-hint"
+                            style="display: none; color: #FFC107; font-weight: 600; margin-top: 4px; display: block;">
+                            💡 En modo de pruebas, usa: <strong>123456</strong>
+                        </small>
                     </div>
 
                     <button type="submit" class="btn btn-primary" id="verify-btn">
@@ -45,9 +57,20 @@
     <script src="js/utils.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/testing.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             initTheme();
+
+            // Verificar modo de pruebas
+            const testMode = localStorage.getItem('test_mode') === 'true';
+            const testBanner = document.getElementById('test-mode-banner');
+            const testHint = document.getElementById('test-otp-hint');
+
+            if (testMode) {
+                if (testBanner) testBanner.style.display = 'block';
+                if (testHint) testHint.style.display = 'block';
+            }
         });
 
         const phone = getURLParameter('phone');

@@ -1,0 +1,7 @@
+{
+  "userId": "user_123456",
+  "reason": "Solicitud de eliminación de cuenta",
+  "confirmDelete": true,
+  "deleteRelatedData": false
+}
+

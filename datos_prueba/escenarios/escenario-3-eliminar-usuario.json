@@ -1,0 +1,46 @@
+{
+  "nombre": "Escenario 3: Eliminar Usuario",
+  "descripcion": "Flujo completo para buscar y eliminar permanentemente un usuario",
+  "pasos": [
+    {
+      "paso": 1,
+      "endpoint": "POST /admin/user/by-phone",
+      "request": {
+        "phone": "+573001234567"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "user_123456",
+          "name": "Juan Pérez",
+          "phone": "+573001234567",
+          "isActive": true
+        }
+      }
+    },
+    {
+      "paso": 2,
+      "endpoint": "POST /admin/user/delete",
+      "request": {
+        "userId": "user_123456",
+        "reason": "Solicitud de eliminación de cuenta",
+        "confirmDelete": true,
+        "deleteRelatedData": true
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Usuario eliminado permanentemente",
+          "data": {
+            "id": "user_123456",
+            "deletedAt": "2024-12-15T17:05:00.000Z",
+            "deletedBy": "admin_user_789",
+            "deletionReason": "Solicitud de eliminación de cuenta"
+          }
+        }
+      }
+    }
+  ]
+}
+

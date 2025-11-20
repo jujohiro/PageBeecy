@@ -1,0 +1,16 @@
+{
+  "accesstoken": "test_admin_token_123456789",
+  "refreshToken": "test_refresh_token_123456789",
+  "id": "admin_test_001",
+  "registerStatus": "verified",
+  "user": {
+    "id": "admin_test_001",
+    "name": "Admin de Prueba",
+    "email": "admin@test.beecy.app",
+    "phone": "+573001234567",
+    "role": "administrator",
+    "isVerified": true,
+    "isActive": true
+  }
+}
+

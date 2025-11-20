@@ -1,0 +1,7 @@
+{
+  "userId": "user_123456",
+  "reason": "Solicitud del usuario",
+  "notes": "Usuario solicitó desactivación temporal",
+  "deactivateUntil": null
+}
+

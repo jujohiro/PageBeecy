@@ -355,7 +355,8 @@
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px 16px;
             font-size: 16px;
@@ -373,7 +374,8 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
@@ -421,6 +423,92 @@
             display: block;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 0;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+        }
+
+        .modal form {
+            padding: 24px;
+        }
+
+        /* Test Mode Indicator */
+        .test-mode-indicator {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: #FFC107;
+            color: #000;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1500;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .test-mode-indicator.active {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -445,6 +533,11 @@
 
             .page-heading {
                 font-size: 28px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
             }
         }
     </style>
@@ -480,6 +573,9 @@
         <header class="top-header">
             <h2>Dashboard</h2>
             <div class="top-header-actions">
+                <button class="icon-btn" id="test-mode-btn" onclick="toggleTestMode()" title="Modo de Pruebas">
+                    <span class="material-symbols-outlined">science</span>
+                </button>
                 <button class="icon-btn" id="theme-toggle-btn" onclick="toggleThemeMode()" title="Cambiar tema">
                     <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
                 </button>
@@ -488,6 +584,11 @@
                 </button>
             </div>
         </header>
+
+        <!-- Test Mode Indicator -->
+        <div id="test-mode-indicator" class="test-mode-indicator">
+            🧪 MODO DE PRUEBAS ACTIVO
+        </div>
 
         <!-- Content -->
         <div class="content-area">
@@ -612,6 +713,7 @@
     <script src="js/auth.js"></script>
     <script src="js/posts.js"></script>
     <script src="js/users.js"></script>
+    <script src="js/testing.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 

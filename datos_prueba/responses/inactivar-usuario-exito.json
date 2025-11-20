@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "message": "Usuario inactivado exitosamente",
+  "data": {
+    "id": "user_123456",
+    "isActive": false,
+    "deactivatedAt": "2024-12-15T16:50:00.000Z",
+    "deactivationReason": "Solicitud del usuario",
+    "deactivatedBy": "admin_user_789",
+    "deactivateUntil": null
+  }
+}
+

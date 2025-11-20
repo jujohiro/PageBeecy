@@ -1,0 +1,13 @@
+{
+  "userId": "user_123456",
+  "name": "Juan Carlos Pérez",
+  "email": "juan.carlos.perez@example.com",
+  "biography": "Desarrollador Full Stack con 10 años de experiencia",
+  "age": 35,
+  "gender": "male",
+  "birthDate": "1989-05-15T00:00:00.000Z",
+  "isVerified": true,
+  "verificationStatus": "verified",
+  "image": "https://example.com/profile/new_image.jpg"
+}
+

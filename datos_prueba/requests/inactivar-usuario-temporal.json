@@ -1,0 +1,7 @@
+{
+  "userId": "user_123456",
+  "reason": "Suspensión temporal",
+  "notes": "Usuario suspendido por 7 días",
+  "deactivateUntil": "2024-12-22T00:00:00.000Z"
+}
+

@@ -1,7 +1,7 @@
 // Funciones para gestión de usuarios
 
 /**
- * Obtiene un usuario por número de teléfono
+ * Obtiene un usuario por número de teléfono (endpoint de administración)
  * @param {string} phoneNumber - Número de teléfono del usuario
  * @returns {Promise<Object>} - Información del usuario
  */
@@ -11,10 +11,20 @@ async function getUserByPhone(phoneNumber) {
         throw new Error('Formato de teléfono inválido. Debe ser un número internacional (ej: +573001234567)');
     }
     
-    const response = await apiGet(`/auth/get-user?phone=${encodeURIComponent(formattedPhone)}`, true);
+    // Usar endpoint de administración según documentación
+    const response = await apiPost('/admin/user/by-phone', {
+        phone: formattedPhone
+    }, true);
     
     if (!response) {
         throw new Error('No se recibió respuesta del servidor.');
+    }
+    
+    // Si la respuesta tiene un error, lanzarlo
+    if (response.error) {
+        const error = new Error(response.error);
+        error.status = 404;
+        throw error;
     }
     
     return response;
@@ -125,24 +135,34 @@ async function createUserWithOtp(phone, otp, additionalData = {}) {
 }
 
 /**
- * Elimina un usuario
+ * Elimina un usuario permanentemente (endpoint de administración)
  * @param {string} userId - ID del usuario
+ * @param {string} reason - Razón de la eliminación
+ * @param {boolean} deleteRelatedData - Si eliminar datos relacionados
  * @returns {Promise<Object>} - Respuesta del servidor
  */
-async function deleteUser(userId) {
+async function deleteUser(userId, reason = 'Eliminación solicitada por administrador', deleteRelatedData = true) {
     if (!userId) {
         throw new Error('ID de usuario requerido');
     }
 
     try {
-        // Intentar eliminar usando el endpoint de administración
-        const response = await apiDelete(`/admin/users/${userId}`, true);
+        // Usar endpoint de administración según documentación
+        const response = await apiPost('/admin/user/delete', {
+            userId: userId,
+            reason: reason,
+            confirmDelete: true,
+            deleteRelatedData: deleteRelatedData
+        }, true);
+        
+        if (response.error) {
+            const error = new Error(response.error);
+            error.status = error.message.includes('confirmación') ? 400 : 409;
+            throw error;
+        }
+        
         return response;
     } catch (error) {
-        // Si el endpoint no existe, mostrar mensaje informativo
-        if (error.status === 404 || error.message.includes('not found')) {
-            throw new Error('El endpoint para eliminar usuarios no está disponible en el backend');
-        }
         if (error.message) {
             throw error;
         }
@@ -151,7 +171,7 @@ async function deleteUser(userId) {
 }
 
 /**
- * Actualiza información de un usuario
+ * Actualiza información de un usuario (endpoint de administración)
  * @param {string} userId - ID del usuario
  * @param {Object} userData - Datos a actualizar
  * @returns {Promise<Object>} - Respuesta del servidor
@@ -162,7 +182,21 @@ async function updateUser(userId, userData) {
     }
 
     try {
-        const response = await updateProfile(userId, userData);
+        // Usar endpoint de administración según documentación
+        const requestData = {
+            userId: userId,
+            ...userData
+        };
+        
+        const response = await apiPost('/admin/user/update', requestData, true);
+        
+        if (response.error) {
+            const error = new Error(response.error);
+            error.status = response.details ? 422 : 404;
+            error.details = response.details;
+            throw error;
+        }
+        
         return response;
     } catch (error) {
         if (error.message) {
@@ -203,35 +237,69 @@ async function getUsersList(filters = {}) {
 }
 
 /**
- * Cambia el estado de un usuario (activar/suspender)
+ * Inactiva un usuario (endpoint de administración)
  * @param {string} userId - ID del usuario
- * @param {string} status - Nuevo estado (active, suspended, etc.)
+ * @param {string} reason - Razón de la inactivación
+ * @param {string} notes - Notas adicionales
+ * @param {string} deactivateUntil - Fecha de reactivación automática (ISO 8601)
  * @returns {Promise<Object>} - Respuesta del servidor
  */
-async function changeUserStatus(userId, status) {
+async function deactivateUser(userId, reason = '', notes = '', deactivateUntil = null) {
     if (!userId) {
         throw new Error('ID de usuario requerido');
     }
 
-    if (!status) {
-        throw new Error('Estado requerido');
-    }
-
     try {
-        const response = await apiPut(`/admin/users/${userId}/status`, { status }, true);
+        const response = await apiPost('/admin/user/deactivate', {
+            userId: userId,
+            reason: reason,
+            notes: notes,
+            deactivateUntil: deactivateUntil
+        }, true);
+        
+        if (response.error) {
+            const error = new Error(response.error);
+            error.status = 400;
+            throw error;
+        }
+        
         return response;
     } catch (error) {
-        // Si el endpoint no existe, intentar actualizar el perfil
-        if (error.status === 404) {
-            try {
-                return await updateProfile(userId, { status });
-            } catch (updateError) {
-                throw new Error('El endpoint para cambiar el estado de usuarios no está disponible');
-            }
-        }
         if (error.message) {
             throw error;
         }
-        throw new Error('Error al cambiar estado del usuario: ' + (error.message || 'Error desconocido'));
+        throw new Error('Error al inactivar usuario: ' + (error.message || 'Error desconocido'));
+    }
+}
+
+/**
+ * Reactiva un usuario (endpoint de administración)
+ * @param {string} userId - ID del usuario
+ * @param {string} notes - Notas sobre la reactivación
+ * @returns {Promise<Object>} - Respuesta del servidor
+ */
+async function activateUser(userId, notes = '') {
+    if (!userId) {
+        throw new Error('ID de usuario requerido');
+    }
+
+    try {
+        const response = await apiPost('/admin/user/activate', {
+            userId: userId,
+            notes: notes
+        }, true);
+        
+        if (response.error) {
+            const error = new Error(response.error);
+            error.status = 400;
+            throw error;
+        }
+        
+        return response;
+    } catch (error) {
+        if (error.message) {
+            throw error;
+        }
+        throw new Error('Error al reactivar usuario: ' + (error.message || 'Error desconocido'));
     }
 }

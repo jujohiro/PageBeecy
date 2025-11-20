@@ -236,19 +236,29 @@ async function handleSearchUser() {
     }
 }
 
+// Variable global para almacenar el usuario actual seleccionado
+let currentSelectedUser = null;
+
 function displayUserInTable(user, tableBody) {
     if (!tableBody) return;
+
+    // Guardar usuario actual para usar en otras funciones
+    currentSelectedUser = user;
 
     const userName = user.name || user.username || 'No disponible';
     const userEmail = user.email || 'No disponible';
     const userPhone = user.phone || user.phoneNumber || 'No disponible';
-    const userStatus = user.status || 'active';
+    const isActive = user.isActive !== undefined ? user.isActive : (user.status === 'active' || user.status === 'activo');
     const userId = user.id || user._id || '';
 
     const avatarInitial = userName.charAt(0).toUpperCase();
-    const statusBadge = userStatus === 'active' || userStatus === 'activo'
+    const statusBadge = isActive
         ? '<span class="status-badge status-active">Activo</span>'
-        : '<span class="status-badge status-suspended">Suspendido</span>';
+        : '<span class="status-badge status-suspended">Inactivo</span>';
+
+    const actionButtons = isActive
+        ? `<button class="table-btn" onclick="handleInactivateUser('${escapeHtml(userId)}')">Inactivar</button>`
+        : `<button class="table-btn" onclick="handleActivateUser('${escapeHtml(userId)}')">Reactivar</button>`;
 
     tableBody.innerHTML = `
         <tr>
@@ -266,6 +276,7 @@ function displayUserInTable(user, tableBody) {
                     <button class="table-btn" onclick="handleEditUser('${escapeHtml(userId)}')">
                         Editar
                     </button>
+                    ${actionButtons}
                     <button class="table-btn delete" onclick="handleDeleteUser('${escapeHtml(userId)}')">
                         Eliminar
                     </button>
@@ -328,14 +339,200 @@ function resetCreateUserForm() {
 }
 
 async function handleEditUser(userId) {
-    // Abrir sección de búsqueda para editar usuario
-    showSection('users', document.querySelector('.sidebar-nav-link[onclick*="users"]'));
+    if (!currentSelectedUser) {
+        showError('No hay usuario seleccionado', document.getElementById('message-container'));
+        return;
+    }
+
+    // Abrir modal de edición
+    openEditUserModal(currentSelectedUser);
+}
+
+function openEditUserModal(user) {
+    // Crear o actualizar modal
+    let modal = document.getElementById('edit-user-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'edit-user-modal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Usuario</h2>
+                <button class="modal-close" onclick="closeEditUserModal()">&times;</button>
+            </div>
+            <form id="edit-user-form" onsubmit="handleUpdateUser(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-name">Nombre</label>
+                        <input type="text" id="edit-name" name="name" value="${escapeHtml(user.name || '')}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email" name="email" value="${escapeHtml(user.email || '')}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-age">Edad</label>
+                        <input type="number" id="edit-age" name="age" value="${user.age || ''}" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-gender">Género</label>
+                        <select id="edit-gender" name="gender">
+                            <option value="">Seleccionar</option>
+                            <option value="male" ${user.gender === 'male' ? 'selected' : ''}>Masculino</option>
+                            <option value="female" ${user.gender === 'female' ? 'selected' : ''}>Femenino</option>
+                            <option value="other" ${user.gender === 'other' ? 'selected' : ''}>Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="edit-biography">Biografía</label>
+                        <textarea id="edit-biography" name="biography" rows="3" style="width: 100%; padding: 12px 16px; font-size: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); background: var(--surface-elevated); color: var(--text-primary); font-family: inherit; resize: vertical;">${escapeHtml(user.biography || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-birthDate">Fecha de Nacimiento</label>
+                        <input type="date" id="edit-birthDate" name="birthDate" value="${user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-image">URL de Imagen</label>
+                        <input type="url" id="edit-image" name="image" value="${escapeHtml(user.image || '')}">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="edit-isVerified" name="isVerified" ${user.isVerified ? 'checked' : ''}>
+                            Usuario Verificado
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="update-user-btn">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
+
+function closeEditUserModal() {
+    const modal = document.getElementById('edit-user-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function handleUpdateUser(event) {
+    event.preventDefault();
     const messageContainer = document.getElementById('message-container');
-    showSuccess('Usa el campo de búsqueda para encontrar y editar el usuario', messageContainer);
+    const updateBtn = document.getElementById('update-user-btn');
+
+    if (!currentSelectedUser) {
+        showError('No hay usuario seleccionado', messageContainer);
+        return;
+    }
+
+    const userId = currentSelectedUser.id || currentSelectedUser._id;
+    const formData = {
+        name: document.getElementById('edit-name').value.trim(),
+        email: document.getElementById('edit-email').value.trim(),
+        age: parseInt(document.getElementById('edit-age').value) || undefined,
+        gender: document.getElementById('edit-gender').value || undefined,
+        biography: document.getElementById('edit-biography').value.trim() || undefined,
+        birthDate: document.getElementById('edit-birthDate').value ? new Date(document.getElementById('edit-birthDate').value).toISOString() : undefined,
+        image: document.getElementById('edit-image').value.trim() || undefined,
+        isVerified: document.getElementById('edit-isVerified').checked
+    };
+
+    // Remover campos undefined
+    Object.keys(formData).forEach(key => {
+        if (formData[key] === undefined || formData[key] === '') {
+            delete formData[key];
+        }
+    });
+
+    updateBtn.disabled = true;
+    updateBtn.textContent = 'Actualizando...';
+    clearMessage(messageContainer);
+
+    try {
+        const response = await updateUser(userId, formData);
+        showSuccess('Usuario actualizado correctamente', messageContainer);
+        closeEditUserModal();
+        
+        // Recargar usuario actualizado
+        if (currentSelectedUser.phone) {
+            await handleSearchUser();
+        }
+    } catch (error) {
+        let errorMessage = error.message || 'Error al actualizar usuario';
+        if (error.details) {
+            errorMessage += ': ' + Object.values(error.details).join(', ');
+        }
+        showError(errorMessage, messageContainer);
+    } finally {
+        updateBtn.disabled = false;
+        updateBtn.textContent = 'Actualizar';
+    }
+}
+
+async function handleInactivateUser(userId) {
+    const reason = prompt('Razón de la inactivación (opcional):');
+    const notes = prompt('Notas adicionales (opcional):');
+    
+    if (reason === null && notes === null) {
+        return; // Usuario canceló
+    }
+
+    const messageContainer = document.getElementById('message-container');
+    clearMessage(messageContainer);
+
+    try {
+        await deactivateUser(userId, reason || '', notes || '');
+        showSuccess('Usuario inactivado correctamente', messageContainer);
+        
+        // Recargar usuario
+        if (currentSelectedUser && currentSelectedUser.phone) {
+            await handleSearchUser();
+        }
+    } catch (error) {
+        showError(error.message || 'Error al inactivar usuario', messageContainer);
+    }
+}
+
+async function handleActivateUser(userId) {
+    const notes = prompt('Notas sobre la reactivación (opcional):');
+    
+    if (notes === null) {
+        return; // Usuario canceló
+    }
+
+    const messageContainer = document.getElementById('message-container');
+    clearMessage(messageContainer);
+
+    try {
+        await activateUser(userId, notes || '');
+        showSuccess('Usuario reactivado correctamente', messageContainer);
+        
+        // Recargar usuario
+        if (currentSelectedUser && currentSelectedUser.phone) {
+            await handleSearchUser();
+        }
+    } catch (error) {
+        showError(error.message || 'Error al reactivar usuario', messageContainer);
+    }
 }
 
 async function handleDeleteUser(userId) {
-    if (!confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
+    const reason = prompt('Razón de la eliminación (requerido):');
+    
+    if (!reason || reason.trim() === '') {
+        showError('Debes proporcionar una razón para eliminar el usuario', document.getElementById('message-container'));
+        return;
+    }
+
+    if (!confirm('¿Estás seguro de que deseas eliminar este usuario permanentemente? Esta acción no se puede deshacer.')) {
         return;
     }
 
@@ -343,18 +540,19 @@ async function handleDeleteUser(userId) {
     clearMessage(messageContainer);
 
     try {
-        await deleteUser(userId);
-        showSuccess('Usuario eliminado', messageContainer);
+        await deleteUser(userId, reason.trim());
+        showSuccess('Usuario eliminado permanentemente', messageContainer);
         const tableBody = document.getElementById('users-table-body');
         if (tableBody) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                        Eliminado
+                        Usuario eliminado
                     </td>
                 </tr>
             `;
         }
+        currentSelectedUser = null;
     } catch (error) {
         showError(error.message || 'Error al eliminar usuario', messageContainer);
     }
@@ -440,6 +638,46 @@ function setupSearchInput() {
     }
 }
 
+// Función para alternar modo de pruebas
+function toggleTestMode() {
+    const currentMode = isTestMode();
+    setTestMode(!currentMode);
+    updateTestModeIndicator(!currentMode);
+    updateTestModeButton(!currentMode);
+    
+    if (!currentMode) {
+        loadAllTestData();
+    }
+}
+
+// Función para actualizar el indicador de modo de pruebas
+function updateTestModeIndicator(enabled) {
+    const indicator = document.getElementById('test-mode-indicator');
+    if (indicator) {
+        if (enabled) {
+            indicator.classList.add('active');
+        } else {
+            indicator.classList.remove('active');
+        }
+    }
+}
+
+// Función para actualizar el botón de modo de pruebas
+function updateTestModeButton(enabled) {
+    const btn = document.getElementById('test-mode-btn');
+    if (btn) {
+        if (enabled) {
+            btn.style.background = 'rgba(255, 193, 7, 0.3)';
+            btn.style.borderColor = '#FFC107';
+            btn.title = 'Desactivar Modo de Pruebas';
+        } else {
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.title = 'Activar Modo de Pruebas';
+        }
+    }
+}
+
 // Inicialización del dashboard
 document.addEventListener('DOMContentLoaded', function () {
     requireAuth();
@@ -447,6 +685,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // Actualizar icono del tema según el tema actual
     const currentTheme = getTheme();
     updateThemeIcon(currentTheme);
+    
+    // Inicializar modo de pruebas
+    const testMode = isTestMode();
+    updateTestModeIndicator(testMode);
+    updateTestModeButton(testMode);
+    if (testMode) {
+        loadAllTestData();
+    }
+    
     loadCurrentUserInfo();
     setupSearchInput();
     populateCountrySelect();

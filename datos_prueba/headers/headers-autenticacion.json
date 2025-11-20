@@ -1,0 +1,6 @@
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer {auth_token}",
+  "Accept-Language": "es"
+}
+

@@ -1,0 +1,8 @@
+{
+  "error": "Datos inválidos",
+  "details": {
+    "email": "El formato del email no es válido",
+    "age": "La edad debe ser un número positivo"
+  }
+}
+

@@ -1,0 +1,7 @@
+{
+  "userId": "user_123456",
+  "reason": "Eliminación solicitada por el usuario",
+  "confirmDelete": true,
+  "deleteRelatedData": true
+}
+

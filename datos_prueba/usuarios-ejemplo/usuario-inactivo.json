@@ -1,0 +1,23 @@
+{
+  "id": "user_789012",
+  "name": "María González",
+  "email": "maria.gonzalez@example.com",
+  "phone": "+573009876543",
+  "birthDate": "1992-08-20T00:00:00.000Z",
+  "age": 32,
+  "gender": "female",
+  "biography": "Diseñadora gráfica",
+  "image": "https://example.com/profile/user_789012.jpg",
+  "isVerified": true,
+  "isActive": false,
+  "referralCode": "XYZ789",
+  "createdAt": "2023-03-10T12:00:00.000Z",
+  "updatedAt": "2024-12-10T10:30:00.000Z",
+  "lastLogin": "2024-12-05T14:20:00.000Z",
+  "verificationStatus": "verified",
+  "role": "user",
+  "deactivatedAt": "2024-12-10T10:30:00.000Z",
+  "deactivationReason": "Solicitud del usuario",
+  "deactivatedBy": "admin_user_789"
+}
+
